@@ -42,27 +42,22 @@
         }
 
         .hero {
-            border: 1px solid var(--line);
-            background: var(--card);
-            box-shadow: var(--shadow);
-            border-radius: 18px;
-            padding: 16px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(4px);
+            padding: 0;
+            margin-bottom: 14px;
             animation: rise-in 400ms ease-out;
         }
 
         .hero-image-wrap {
             display: flex;
             justify-content: center;
-            margin-bottom: 14px;
+            margin-bottom: 0;
         }
 
         .hero-image {
             width: min(280px, 72vw);
             height: auto;
             border-radius: 16px;
-            border: 2px solid #000;
+            border: 15px solid #ffffff;
             display: block;
         }
 
@@ -110,7 +105,6 @@
         .portal-offers {
             margin-left: 12px;
             padding-left: 12px;
-            border-left: 2px solid #c6dde8;
         }
 
         .offers {
@@ -235,10 +229,6 @@
         }
 
         @media (max-width: 620px) {
-            .hero {
-                padding: 12px;
-            }
-
             .site {
                 padding: 12px;
             }
@@ -255,7 +245,8 @@
     <main class="page">
         <section class="hero">
             <div class="hero-image-wrap" id="hero-image-wrap">
-                <img class="hero-image" src="snufking.jpg" alt="Snufking" onerror="document.getElementById('hero-image-wrap').style.display='none'">
+                <img class="hero-image" src="snufking.jpg" alt="Snufking"
+                    onerror="document.getElementById('hero-image-wrap').style.display='none'">
             </div>
         </section>
         <div id="content" class="message">Loading offers...</div>
@@ -282,6 +273,10 @@
             }
             if (text) {
                 element.textContent = text;
+            }
+            if (tag.toLowerCase() === "a") {
+                element.target = "_blank";
+                element.rel = "noopener noreferrer";
             }
             return element;
         }
