@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Offer Links</title>
+    <style>
+        :root {
+            --bg-1: #f8f4ec;
+            --bg-2: #e8efe1;
+            --ink: #182026;
+            --muted: #4b5a66;
+            --card: #ffffffcc;
+            --line: #cfd8cd;
+            --accent: #0b6e4f;
+            --accent-2: #126782;
+            --easy: #1f7a1f;
+            --moderate: #8a5a00;
+            --shadow: 0 10px 30px rgba(24, 32, 38, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 8%, #fff6dd 0%, transparent 30%),
+                radial-gradient(circle at 90% 15%, #d8f0ff 0%, transparent 30%),
+                linear-gradient(150deg, var(--bg-1), var(--bg-2));
+            font-family: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+            line-height: 1.45;
+        }
+
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 28px 16px 40px;
+        }
+
+        .hero {
+            border: 1px solid var(--line);
+            background: var(--card);
+            box-shadow: var(--shadow);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+            animation: rise-in 400ms ease-out;
+        }
+
+        .hero-image-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .hero-image {
+            width: min(280px, 72vw);
+            height: auto;
+            border-radius: 16px;
+            border: 2px solid #000;
+            display: block;
+        }
+
+        .section {
+            margin-top: 24px;
+            animation: rise-in 420ms ease-out;
+        }
+
+        .section h2 {
+            margin: 0 0 12px;
+            font-size: clamp(1.35rem, 3.7vw, 1.8rem);
+            border-bottom: 3px solid #a8c7b5;
+            padding-bottom: 6px;
+        }
+
+        .site-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .site {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 14px;
+        }
+
+        .site-title {
+            margin: 0 0 10px;
+            font-size: 1.24rem;
+            font-weight: 800;
+            color: #0f4f65;
+            background: #e7f2f8;
+            border: 1px solid #c6dde8;
+            border-left: 6px solid #126782;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .site-title a {
+            color: inherit;
+        }
+
+        .portal-offers {
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 2px solid #c6dde8;
+        }
+
+        .offers {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .offer {
+            border-top: 1px dashed #d9e1d7;
+            padding-top: 10px;
+        }
+
+        .offer:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .offer-topline {
+            font-size: 1rem;
+        }
+
+        .amount {
+            font-weight: 800;
+            color: var(--accent);
+            margin-right: 6px;
+        }
+
+        .name {
+            font-weight: 700;
+        }
+
+        .requirement {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .links {
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .links-label {
+            font-size: 0.87rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-right: 2px;
+        }
+
+        .chip {
+            display: inline-block;
+            border: 1px solid #b6d2c3;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.87rem;
+            text-decoration: none;
+            color: #154f3a;
+            background: #f3fbf6;
+        }
+
+        .tag {
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            vertical-align: middle;
+        }
+
+        .tag.easy {
+            background: #e8f8e8;
+            color: var(--easy);
+            border: 1px solid #bde6bd;
+        }
+
+        .tag.moderate {
+            background: #fff6e5;
+            color: var(--moderate);
+            border: 1px solid #efd7a4;
+        }
+
+        .note {
+            margin: 6px 0 0;
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .message {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            color: var(--muted);
+        }
+
+        a {
+            color: #0a4d72;
+        }
+
+        a:hover {
+            color: #07364f;
+        }
+
+        @keyframes rise-in {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 620px) {
+            .hero {
+                padding: 12px;
+            }
+
+            .site {
+                padding: 12px;
+            }
+
+            .portal-offers {
+                margin-left: 8px;
+                padding-left: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-image-wrap" id="hero-image-wrap">
+                <img class="hero-image" src="snufking.jpg" alt="Snufking" onerror="document.getElementById('hero-image-wrap').style.display='none'">
+            </div>
+        </section>
+        <div id="content" class="message">Loading offers...</div>
+    </main>
+
+    <script>
+        // JSON shape: { sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
+        function getEmbeddedData() {
+            const node = document.getElementById("offers-data");
+            if (!node) {
+                return null;
+            }
+            try {
+                return JSON.parse(node.textContent);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function createElement(tag, className, text) {
+            const element = document.createElement(tag);
+            if (className) {
+                element.className = className;
+            }
+            if (text) {
+                element.textContent = text;
+            }
+            return element;
+        }
+
+        function createLinkedSiteTitle(site) {
+            if (!site.name) {
+                return null;
+            }
+
+            const title = createElement("h3", "site-title");
+            if (site.url) {
+                const link = createElement("a", null, site.name);
+                link.href = site.url;
+                title.appendChild(link);
+            } else {
+                title.textContent = site.name;
+            }
+            return title;
+        }
+
+        function createOfferItem(offer) {
+            const item = createElement("li", "offer");
+            const topLine = createElement("div", "offer-topline");
+
+            const amount = createElement("span", "amount", offer.amount || "");
+            const name = createElement("span", "name", offer.name || "");
+
+            if (offer.url) {
+                const link = createElement("a");
+                link.href = offer.url;
+                link.appendChild(amount);
+                link.appendChild(name);
+                topLine.appendChild(link);
+            } else {
+                topLine.appendChild(amount);
+                topLine.appendChild(name);
+            }
+
+            if (offer.tag) {
+                const normalized = offer.tag.toLowerCase();
+                const cssClass = normalized === "easy" ? "easy" : normalized === "moderate" ? "moderate" : "";
+                const tag = createElement("span", "tag " + cssClass, offer.tag);
+                topLine.appendChild(tag);
+            }
+
+            item.appendChild(topLine);
+
+            if (offer.requirement) {
+                const requirement = createElement("div", "requirement");
+                const emphasis = createElement("em", null, "(Requirement: " + offer.requirement + ")");
+                requirement.appendChild(emphasis);
+                item.appendChild(requirement);
+            }
+
+            if (offer.links && offer.links.length > 0) {
+                const links = createElement("div", "links");
+                links.appendChild(createElement("span", "links-label", "Links:"));
+                offer.links.forEach(function (platformLink) {
+                    const link = createElement("a", "chip", platformLink.label);
+                    link.href = platformLink.url;
+                    links.appendChild(link);
+                });
+                item.appendChild(links);
+            }
+
+            return item;
+        }
+
+        function createSiteCard(site) {
+            const card = createElement("article", "site");
+            const isPortalWithOffers = Boolean(site.name && site.offers && site.offers.length > 0);
+
+            if (isPortalWithOffers) {
+                card.classList.add("site-portal");
+            }
+
+            const title = createLinkedSiteTitle(site);
+            if (title) {
+                card.appendChild(title);
+            }
+
+            if (site.note) {
+                card.appendChild(createElement("p", "note", site.note));
+            }
+
+            if (site.offers && site.offers.length > 0) {
+                const offersClass = isPortalWithOffers ? "offers portal-offers" : "offers";
+                const offers = createElement("ul", offersClass);
+                site.offers.forEach(function (offer) {
+                    offers.appendChild(createOfferItem(offer));
+                });
+                card.appendChild(offers);
+            }
+
+            return card;
+        }
+
+        function createSection(section, index) {
+            const wrapper = createElement("section", "section");
+            const titleId = "section-title-" + index;
+            wrapper.setAttribute("aria-labelledby", titleId);
+
+            const heading = createElement("h2", null, section.title || "");
+            heading.id = titleId;
+            wrapper.appendChild(heading);
+
+            const grid = createElement("div", "site-grid");
+            (section.sites || []).forEach(function (site) {
+                grid.appendChild(createSiteCard(site));
+            });
+            wrapper.appendChild(grid);
+
+            return wrapper;
+        }
+
+        function renderPage(data) {
+            const content = document.getElementById("content");
+
+            content.remove();
+            const container = document.querySelector("main.page");
+            const replacement = document.createDocumentFragment();
+            (data.sections || []).forEach(function (section, index) {
+                replacement.appendChild(createSection(section, index));
+            });
+            container.appendChild(replacement);
+        }
+
+        function showError(message) {
+            const content = document.getElementById("content");
+            content.textContent = message;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const embeddedData = getEmbeddedData();
+            if (embeddedData) {
+                renderPage(embeddedData);
+            } else {
+                showError("Unable to load embedded offer data JSON.");
+            }
+        });
+    </script>
+
+    <script id="offers-data" type="application/json">
+{
+    "sections": [
+        {
+            "title": "Bank Offers",
+            "sites": [
+                {
+                    "offers": [
+                        {
+                            "amount": "$55",
+                            "name": "MoneyLion",
+                            "url": "https://mlion.us/$Someguyref",
+                            "requirement": "DD $100"
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$50/$100",
+                            "name": "Simmons Bank Checking Stackable ReferLive Referral",
+                            "url": "https://io.referlive.com/F7JCX9"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Cashback Portals",
+            "sites": [
+                {
+                    "name": "CashInStyle",
+                    "url": "https://cashinstyle.com/?ref=someguyref",
+                    "offers": [
+                        {
+                            "amount": "$394",
+                            "name": "Chime",
+                            "requirement": "Direct Deposit $200",
+                            "links": [
+                                {
+                                    "label": "All Platforms",
+                                    "url": "https://cashinstyle.com/walls/offers/41221987?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$110",
+                            "name": "FanDuel Sportsbook",
+                            "requirement": "Deposit $10",
+                            "tag": "EASY",
+                            "links": [
+                                {
+                                    "label": "Android",
+                                    "url": "https://cashinstyle.com/walls/offers/41214146?ref=someguyref"
+                                },
+                                {
+                                    "label": "iOS",
+                                    "url": "https://cashinstyle.com/walls/offers/40535972?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$198",
+                            "name": "Caesars Palace Online Casino",
+                            "requirement": "Deposit $20 and make single wager of at least $20",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/40647473?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$110",
+                            "name": "Caesars Sportsbook",
+                            "requirement": "Deposit $20 and make single wager of at least $20",
+                            "tag": "Moderate",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/40795962?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$90",
+                            "name": "SoFi Invest",
+                            "requirement": "Deposit $25",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/40315125?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$74",
+                            "name": "The Farmer's Dog",
+                            "requirement": "Place order, smallest is $17",
+                            "tag": "EASY",
+                            "links": [
+                                {
+                                    "label": "All Platforms",
+                                    "url": "https://cashinstyle.com/walls/offers/40539958?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$25",
+                            "name": "Uphold",
+                            "requirement": "Make a crypto trade",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/40919974?ref=someguyref"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "TopCashBack",
+                    "url": "https://www.topcashback.com/ref/somethingusername"
+                },
+                {
+                    "name": "GemsLoot",
+                    "url": "https://gemsloot.com/?aff=someguy",
+                    "note": "Search for these offers after signup:",
+                    "offers": [
+                        {
+                            "amount": "$312",
+                            "name": "Chime",
+                            "requirement": "Direct Deposit $200"
+                        },
+                        {
+                            "amount": "$210",
+                            "name": "Airwallex",
+                            "requirement": "Open business checking, make any transaction like transfer"
+                        },
+                        {
+                            "amount": "$105",
+                            "name": "Caesars Sportsbook",
+                            "requirement": "Deposit $20 and make single wager of at least $20"
+                        },
+                        {
+                            "amount": "$100",
+                            "name": "Ark7",
+                            "requirement": "Purchase $100 real estate investment, hold for 3 months"
+                        }
+                    ]
+                },
+                {
+                    "name": "InboxDollars",
+                    "url": "https://www.inboxdollars.com?rb=207544411"
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$80",
+                            "name": "CapitalOne Shopping",
+                            "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+    </script>
+</body>
+
+</html>
