@@ -266,6 +266,28 @@
             }
         }
 
+        function linkifyText(text) {
+            const fragment = document.createDocumentFragment();
+            const pattern = /(https?:\/\/[^\s]+|[^\s@]+@[^\s@]+\.[^\s@]+)/g;
+            let lastIndex = 0;
+            let match;
+            while ((match = pattern.exec(text)) !== null) {
+                if (match.index > lastIndex) {
+                    fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+                }
+                const matched = match[0];
+                const link = createElement("a");
+                link.href = matched.startsWith("http") ? matched : "mailto:" + matched;
+                link.textContent = matched;
+                fragment.appendChild(link);
+                lastIndex = match.index + matched.length;
+            }
+            if (lastIndex < text.length) {
+                fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+            }
+            return fragment;
+        }
+
         function createElement(tag, className, text) {
             const element = document.createElement(tag);
             if (className) {
@@ -326,7 +348,9 @@
 
             if (offer.requirement) {
                 const requirement = createElement("div", "requirement");
-                const emphasis = createElement("em", null, "Requirement: " + offer.requirement);
+                const emphasis = createElement("em");
+                emphasis.appendChild(document.createTextNode("Requirement: "));
+                emphasis.appendChild(linkifyText(offer.requirement));
                 requirement.appendChild(emphasis);
                 item.appendChild(requirement);
             }
@@ -334,7 +358,9 @@
             if (offer.details && offer.details.length > 0) {
                 const details = createElement("div", "requirement");
                 if (offer.details.length === 1) {
-                    const emphasis = createElement("em", null, "Details: " + offer.details[0]);
+                    const emphasis = createElement("em");
+                    emphasis.appendChild(document.createTextNode("Details: "));
+                    emphasis.appendChild(linkifyText(offer.details[0]));
                     details.appendChild(emphasis);
                 } else {
                     const label = createElement("em", null, "Details:");
@@ -343,12 +369,24 @@
                     list.style.margin = "2px 0 0";
                     list.style.paddingLeft = "20px";
                     offer.details.forEach(function (entry) {
-                        const li = createElement("li", null, entry);
+                        const li = createElement("li");
+                        li.appendChild(linkifyText(entry));
                         list.appendChild(li);
                     });
                     details.appendChild(list);
                 }
                 item.appendChild(details);
+            }
+
+            if (offer.terms) {
+                const terms = createElement("div", "requirement");
+                const emphasis = createElement("em");
+                emphasis.appendChild(document.createTextNode("Official Terms: "));
+                const link = createElement("a", null, offer.terms);
+                link.href = offer.terms;
+                emphasis.appendChild(link);
+                terms.appendChild(emphasis);
+                item.appendChild(terms);
             }
 
             if (offer.links && offer.links.length > 0) {
@@ -471,8 +509,9 @@
                         {
                             "amount": "$500/$1000",
                             "name": "Rho (Business)",
-                            "requirement": "Maintain $20k/$100k average balance for 30 days within 90 days. Offical Terms: https://www.rho.co/referral-program-terms-conditions",
-							"details": ["LLCs and corporations only", "No Fees", "Request referral by emailing someguyref@atomicmail.io your first name and business email address, then you will receive a referral email invite from Rho."]
+                            "requirement": "Maintain $20k/$100k average balance for 30 days within 90 days.",
+                            "details": ["LLCs and corporations only", "No Fees", "Request referral by emailing someguyref@atomicmail.io your first name and business email address, then you will receive a referral email invite from Rho."],
+                            "terms": "https://www.rho.co/referral-program-terms-conditions"
                         }
                     ]
                 },
@@ -482,7 +521,8 @@
                             "amount": "$500 or $1000",
                             "name": "Brex (Business)",
                             "url": "https://www.brex.com/signup?rc=Gq8GBCh",
-                            "requirement": "$500: Spend $5000 in first 30 days. $1000: Spend $5000 in first 30 days AND make two successful payroll transactions and two ACH payments within the first three months. Offical Terms: https://www.brex.com/legal/brex-referrals-program"
+                            "requirement": "$500: Spend $5000 in first 30 days. $1000: Spend $5000 in first 30 days AND make two successful payroll transactions and two ACH payments within the first three months.",
+                            "terms": "https://www.brex.com/legal/brex-referrals-program"
                         }
                     ]
                 },
