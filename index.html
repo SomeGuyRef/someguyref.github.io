@@ -200,6 +200,22 @@
             font-style: italic;
         }
 
+        .reveal-email {
+            background: none;
+            border: 1px dashed #0a4d72;
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: #0a4d72;
+            cursor: pointer;
+            font-size: inherit;
+            font-family: inherit;
+            font-style: inherit;
+        }
+
+        .reveal-email:hover {
+            background: #e8f0f5;
+        }
+
         .message {
             border: 1px solid var(--line);
             border-radius: 10px;
@@ -253,7 +269,9 @@
     </main>
 
     <script>
-        // JSON shape: { sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
+        // JSON shape: { emails?, sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
+        let emailsMap = {};
+
         function getEmbeddedData() {
             const node = document.getElementById("offers-data");
             if (!node) {
@@ -268,7 +286,7 @@
 
         function linkifyText(text) {
             const fragment = document.createDocumentFragment();
-            const pattern = /(https?:\/\/[^\s]+|[^\s@]+@[^\s@]+\.[^\s@]+)/g;
+            const pattern = /(https?:\/\/[^\s]+|\[email(?::[\w-]+)?\])/g;
             let lastIndex = 0;
             let match;
             while ((match = pattern.exec(text)) !== null) {
@@ -276,10 +294,30 @@
                     fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
                 }
                 const matched = match[0];
-                const link = createElement("a");
-                link.href = matched.startsWith("http") ? matched : "mailto:" + matched;
-                link.textContent = matched;
-                fragment.appendChild(link);
+                if (matched.startsWith("[email")) {
+                    const key = matched.length > 7 ? matched.slice(7, -1) : "default";
+                    const encoded = emailsMap[key] || "";
+                    if (!encoded) {
+                        fragment.appendChild(document.createTextNode(matched));
+                    } else {
+                        const button = document.createElement("button");
+                        button.className = "reveal-email";
+                        button.textContent = "show email";
+                        button.addEventListener("click", function () {
+                            const email = atob(encoded);
+                            const link = createElement("a");
+                            link.href = "mailto:" + email;
+                            link.textContent = email;
+                            button.parentNode.replaceChild(link, button);
+                        });
+                        fragment.appendChild(button);
+                    }
+                } else {
+                    const link = createElement("a");
+                    link.href = matched;
+                    link.textContent = matched;
+                    fragment.appendChild(link);
+                }
                 lastIndex = match.index + matched.length;
             }
             if (lastIndex < text.length) {
@@ -353,7 +391,7 @@
                 const requirementsEl = createElement("div", "requirement");
                 if (requirements.length === 1) {
                     const emphasis = createElement("em");
-                    emphasis.appendChild(document.createTextNode("Requirements: "));
+                    emphasis.appendChild(document.createTextNode("Requirement: "));
                     emphasis.appendChild(linkifyText(requirements[0]));
                     requirementsEl.appendChild(emphasis);
                 } else {
@@ -468,6 +506,7 @@
         }
 
         function renderPage(data) {
+            emailsMap = data.emails || {};
             const content = document.getElementById("content");
 
             content.remove();
@@ -496,6 +535,9 @@
 
     <script id="offers-data" type="application/json">
 {
+    "emails": {
+        "default": "c29tZWd1eXJlZkBhdG9taWNtYWlsLmlv"
+    },
     "sections": [
         {
             "title": "Charities",
@@ -527,7 +569,7 @@
                             "amount": "$500/$1000",
                             "name": "Rho (Business)",
                             "requirements": "Maintain $20k/$100k average balance for 30 days within 90 days.",
-                            "details": ["LLCs and corporations only", "No Fees", "Request referral by emailing someguyref@atomicmail.io your first name and business email address, then you will receive a referral email invite from Rho."],
+                            "details": ["LLCs and corporations only", "No Fees", "Request referral by emailing [email] your first name and business email address, then you will receive a referral email invite from Rho."],
                             "terms": "https://www.rho.co/referral-program-terms-conditions"
                         }
                     ]
