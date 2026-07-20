@@ -346,36 +346,53 @@
 
             item.appendChild(topLine);
 
-            if (offer.requirement) {
-                const requirement = createElement("div", "requirement");
-                const emphasis = createElement("em");
-                emphasis.appendChild(document.createTextNode("Requirement: "));
-                emphasis.appendChild(linkifyText(offer.requirement));
-                requirement.appendChild(emphasis);
-                item.appendChild(requirement);
-            }
+            const requirements = Array.isArray(offer.requirements) ? offer.requirements : (offer.requirements ? [offer.requirements] : []);
+            const details = Array.isArray(offer.details) ? offer.details : (offer.details ? [offer.details] : []);
 
-            if (offer.details && offer.details.length > 0) {
-                const details = createElement("div", "requirement");
-                if (offer.details.length === 1) {
+            if (requirements.length > 0) {
+                const requirementsEl = createElement("div", "requirement");
+                if (requirements.length === 1) {
                     const emphasis = createElement("em");
-                    emphasis.appendChild(document.createTextNode("Details: "));
-                    emphasis.appendChild(linkifyText(offer.details[0]));
-                    details.appendChild(emphasis);
+                    emphasis.appendChild(document.createTextNode("Requirements: "));
+                    emphasis.appendChild(linkifyText(requirements[0]));
+                    requirementsEl.appendChild(emphasis);
                 } else {
-                    const label = createElement("em", null, "Details:");
-                    details.appendChild(label);
+                    const label = createElement("em", null, "Requirements:");
+                    requirementsEl.appendChild(label);
                     const list = createElement("ul", null);
                     list.style.margin = "2px 0 0";
                     list.style.paddingLeft = "20px";
-                    offer.details.forEach(function (entry) {
+                    requirements.forEach(function (entry) {
                         const li = createElement("li");
                         li.appendChild(linkifyText(entry));
                         list.appendChild(li);
                     });
-                    details.appendChild(list);
+                    requirementsEl.appendChild(list);
                 }
-                item.appendChild(details);
+                item.appendChild(requirementsEl);
+            }
+
+            if (details.length > 0) {
+                const detailsEl = createElement("div", "requirement");
+                if (details.length === 1) {
+                    const emphasis = createElement("em");
+                    emphasis.appendChild(document.createTextNode("Details: "));
+                    emphasis.appendChild(linkifyText(details[0]));
+                    detailsEl.appendChild(emphasis);
+                } else {
+                    const label = createElement("em", null, "Details:");
+                    detailsEl.appendChild(label);
+                    const list = createElement("ul", null);
+                    list.style.margin = "2px 0 0";
+                    list.style.paddingLeft = "20px";
+                    details.forEach(function (entry) {
+                        const li = createElement("li");
+                        li.appendChild(linkifyText(entry));
+                        list.appendChild(li);
+                    });
+                    detailsEl.appendChild(list);
+                }
+                item.appendChild(detailsEl);
             }
 
             if (offer.terms) {
@@ -489,7 +506,7 @@
                             "amount": "(good karma)",
                             "name": "Cure Alzheimer's Fund (DoC Supported Charity)",
                             "url": "https://give.curealz.org/team/821348",
-                            "requirement": "Donate any amount",
+                            "requirements": "Donate any amount",
                             "links": [
                                 {
                                     "label": "More Info",
@@ -509,7 +526,7 @@
                         {
                             "amount": "$500/$1000",
                             "name": "Rho (Business)",
-                            "requirement": "Maintain $20k/$100k average balance for 30 days within 90 days.",
+                            "requirements": "Maintain $20k/$100k average balance for 30 days within 90 days.",
                             "details": ["LLCs and corporations only", "No Fees", "Request referral by emailing someguyref@atomicmail.io your first name and business email address, then you will receive a referral email invite from Rho."],
                             "terms": "https://www.rho.co/referral-program-terms-conditions"
                         }
@@ -521,7 +538,7 @@
                             "amount": "$500 or $1000",
                             "name": "Brex (Business)",
                             "url": "https://www.brex.com/signup?rc=Gq8GBCh",
-                            "requirement": "$500: Spend $5000 in first 30 days. $1000: Spend $5000 in first 30 days AND make two successful payroll transactions and two ACH payments within the first three months.",
+                            "requirements": ["$500: Spend $5000 in first 30 days.", "$1000: Spend $5000 in first 30 days AND make two successful payroll transactions and two ACH payments within the first three months."],
                             "terms": "https://www.brex.com/legal/brex-referrals-program"
                         }
                     ]
@@ -532,7 +549,7 @@
                             "amount": "$55",
                             "name": "MoneyLion",
                             "url": "https://mlion.us/$Someguyref",
-                            "requirement": "DD $100"
+                            "requirements": "DD $100"
                         }
                     ]
                 },
@@ -542,7 +559,7 @@
                             "amount": "$50",
                             "name": "OnePay",
                             "url": "https://web.onepay.com/wlink/refer-a-friend?product=one_banking&referral_code=stB_omYQK&referrer_campaign_id=campaign.db1edd0a-4a5b-4651-8c20-d0fb7e98fec5",
-                            "requirement": "DD $500"
+                            "requirements": "DD $500"
                         }
                     ]
                 },
@@ -567,7 +584,7 @@
                         {
                             "amount": "$394",
                             "name": "Chime",
-                            "requirement": "Direct Deposit $200",
+                            "requirements": "Direct Deposit $200",
                             "links": [
                                 {
                                     "label": "All Platforms",
@@ -578,7 +595,7 @@
                         {
                             "amount": "$110",
                             "name": "FanDuel Sportsbook",
-                            "requirement": "Deposit $10",
+                            "requirements": "Deposit $10",
                             "tag": "EASY",
                             "links": [
                                 {
@@ -594,7 +611,7 @@
                         {
                             "amount": "$198",
                             "name": "Caesars Palace Online Casino",
-                            "requirement": "Deposit $20 and make single wager of at least $20",
+                            "requirements": "Deposit $20 and make single wager of at least $20",
                             "links": [
                                 {
                                     "label": "Desktop",
@@ -605,7 +622,7 @@
                         {
                             "amount": "$110",
                             "name": "Caesars Sportsbook",
-                            "requirement": "Deposit $20 and make single wager of at least $20",
+                            "requirements": "Deposit $20 and make single wager of at least $20",
                             "tag": "Moderate",
                             "links": [
                                 {
@@ -617,7 +634,7 @@
                         {
                             "amount": "$90",
                             "name": "SoFi Invest",
-                            "requirement": "Deposit $25",
+                            "requirements": "Deposit $25",
                             "links": [
                                 {
                                     "label": "Desktop",
@@ -628,7 +645,7 @@
                         {
                             "amount": "$74",
                             "name": "The Farmer's Dog",
-                            "requirement": "Place order, smallest is $17",
+                            "requirements": "Place order, smallest is $17",
                             "tag": "EASY",
                             "links": [
                                 {
@@ -640,7 +657,7 @@
                         {
                             "amount": "$25",
                             "name": "Uphold",
-                            "requirement": "Make a crypto trade",
+                            "requirements": "Make a crypto trade",
                             "links": [
                                 {
                                     "label": "Desktop",
@@ -662,22 +679,22 @@
                         {
                             "amount": "$312",
                             "name": "Chime",
-                            "requirement": "Direct Deposit $200"
+                            "requirements": "Direct Deposit $200"
                         },
                         {
                             "amount": "$210",
                             "name": "Airwallex",
-                            "requirement": "Open business checking, make any transaction (ie. transfer, micro deposits)"
+                            "requirements": "Open business checking, make any transaction (ie. transfer, micro deposits)"
                         },
                         {
                             "amount": "$105",
                             "name": "Caesars Sportsbook",
-                            "requirement": "Deposit $20 and make single wager of at least $20"
+                            "requirements": "Deposit $20 and make single wager of at least $20"
                         },
                         {
                             "amount": "$100",
                             "name": "Ark7",
-                            "requirement": "Purchase $100 real estate investment, hold for 3 months"
+                            "requirements": "Purchase $100 real estate investment, hold for 3 months"
                         }
                     ]
                 },
