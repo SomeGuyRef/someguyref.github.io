@@ -145,6 +145,52 @@
             font-size: 0.96rem;
         }
 
+        .instructions-list {
+            margin: 4px 0 0;
+            padding-left: 20px;
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .instructions-sublist {
+            margin: 4px 0 4px;
+            padding-left: 18px;
+            list-style: disc;
+        }
+
+        details.instructions {
+            margin-top: 6px;
+            border: 1px solid #cfe0d6;
+            border-radius: 8px;
+            background: #f5faf7;
+            padding: 6px 10px;
+        }
+
+        details.collapsible-block {
+            margin-top: 6px;
+            border: 1px solid #ecd7a8;
+            border-radius: 8px;
+            background: #fdf7e8;
+            padding: 6px 10px;
+        }
+
+        details.instructions>summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: #154f3a;
+        }
+
+        details.collapsible-block>summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: #8a5a00;
+        }
+
+        details.instructions[open]>summary,
+        details.collapsible-block[open]>summary {
+            margin-bottom: 4px;
+        }
+
         .links {
             margin-top: 6px;
             display: flex;
@@ -286,7 +332,7 @@
 
         function linkifyText(text) {
             const fragment = document.createDocumentFragment();
-            const pattern = /(https?:\/\/[^\s]+|\[email(?::[\w-]+)?\])/g;
+            const pattern = /(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\])/g;
             let lastIndex = 0;
             let match;
             while ((match = pattern.exec(text)) !== null) {
@@ -294,7 +340,17 @@
                     fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
                 }
                 const matched = match[0];
-                if (matched.startsWith("[email")) {
+                if (matched.startsWith("**")) {
+                    const strong = createElement("strong");
+                    strong.textContent = matched.slice(2, -2);
+                    fragment.appendChild(strong);
+                } else if (matched.startsWith("[") && matched.indexOf("](") !== -1) {
+                    const splitIndex = matched.indexOf("](");
+                    const link = createElement("a");
+                    link.href = matched.slice(splitIndex + 2, -1);
+                    link.textContent = matched.slice(1, splitIndex);
+                    fragment.appendChild(link);
+                } else if (matched.startsWith("[email")) {
                     const key = matched.length > 7 ? matched.slice(7, -1) : "default";
                     const encoded = emailsMap[key] || "";
                     if (!encoded) {
@@ -357,6 +413,76 @@
             return title;
         }
 
+        function buildStepList(steps) {
+            const list = createElement("ol", "instructions-list");
+            steps.forEach(function (step) {
+                const li = createElement("li");
+                if (step && typeof step === "object") {
+                    li.appendChild(linkifyText(step.text || ""));
+                    const substeps = Array.isArray(step.substeps) ? step.substeps : [];
+                    if (substeps.length > 0) {
+                        const sub = createElement("ul", "instructions-sublist");
+                        substeps.forEach(function (entry) {
+                            const subLi = createElement("li");
+                            subLi.appendChild(linkifyText(entry));
+                            sub.appendChild(subLi);
+                        });
+                        li.appendChild(sub);
+                    }
+                } else {
+                    li.appendChild(linkifyText(step));
+                }
+                list.appendChild(li);
+            });
+            return list;
+        }
+
+        function createInstructionsBlock(steps, collapsible, label) {
+            if (collapsible) {
+                const details = createElement("details", "instructions");
+                const summary = createElement("summary", null, label);
+                details.appendChild(summary);
+                details.appendChild(buildStepList(steps));
+                return details;
+            }
+            const wrapper = createElement("div", "requirement");
+            wrapper.appendChild(createElement("em", null, label + ":"));
+            wrapper.appendChild(buildStepList(steps));
+            return wrapper;
+        }
+
+        function buildBulletList(items) {
+            const list = createElement("ul", null);
+            list.style.margin = "2px 0 0";
+            list.style.paddingLeft = "20px";
+            items.forEach(function (entry) {
+                const li = createElement("li");
+                li.appendChild(linkifyText(entry));
+                list.appendChild(li);
+            });
+            return list;
+        }
+
+        function createDetailsBlock(items, collapsible, label) {
+            if (collapsible) {
+                const details = createElement("details", "collapsible-block");
+                details.appendChild(createElement("summary", null, label));
+                details.appendChild(buildBulletList(items));
+                return details;
+            }
+            const wrapper = createElement("div", "requirement");
+            if (items.length === 1) {
+                const emphasis = createElement("em");
+                emphasis.appendChild(document.createTextNode(label + ": "));
+                emphasis.appendChild(linkifyText(items[0]));
+                wrapper.appendChild(emphasis);
+            } else {
+                wrapper.appendChild(createElement("em", null, label + ":"));
+                wrapper.appendChild(buildBulletList(items));
+            }
+            return wrapper;
+        }
+
         function createOfferItem(offer) {
             const item = createElement("li", "offer");
             const topLine = createElement("div", "offer-topline");
@@ -385,7 +511,14 @@
             item.appendChild(topLine);
 
             const requirements = Array.isArray(offer.requirements) ? offer.requirements : (offer.requirements ? [offer.requirements] : []);
-            const details = Array.isArray(offer.details) ? offer.details : (offer.details ? [offer.details] : []);
+            const detailsData = offer.details;
+            const detailItems = Array.isArray(detailsData)
+                ? detailsData
+                : (detailsData && typeof detailsData === "object"
+                    ? (Array.isArray(detailsData.items) ? detailsData.items : [])
+                    : (detailsData ? [detailsData] : []));
+            const detailsCollapsible = Boolean(detailsData) && !Array.isArray(detailsData) && typeof detailsData === "object" && detailsData.collapsible === true;
+            const detailsLabel = (detailsData && !Array.isArray(detailsData) && typeof detailsData === "object" && detailsData.label) ? detailsData.label : "Details";
 
             if (requirements.length > 0) {
                 const requirementsEl = createElement("div", "requirement");
@@ -410,27 +543,20 @@
                 item.appendChild(requirementsEl);
             }
 
-            if (details.length > 0) {
-                const detailsEl = createElement("div", "requirement");
-                if (details.length === 1) {
-                    const emphasis = createElement("em");
-                    emphasis.appendChild(document.createTextNode("Details: "));
-                    emphasis.appendChild(linkifyText(details[0]));
-                    detailsEl.appendChild(emphasis);
-                } else {
-                    const label = createElement("em", null, "Details:");
-                    detailsEl.appendChild(label);
-                    const list = createElement("ul", null);
-                    list.style.margin = "2px 0 0";
-                    list.style.paddingLeft = "20px";
-                    details.forEach(function (entry) {
-                        const li = createElement("li");
-                        li.appendChild(linkifyText(entry));
-                        list.appendChild(li);
-                    });
-                    detailsEl.appendChild(list);
+            if (offer.instructions) {
+                const instructions = offer.instructions;
+                const steps = Array.isArray(instructions)
+                    ? instructions
+                    : (Array.isArray(instructions.steps) ? instructions.steps : []);
+                const collapsible = !Array.isArray(instructions) && instructions.collapsible === true;
+                const label = (!Array.isArray(instructions) && instructions.label) ? instructions.label : "Instructions";
+                if (steps.length > 0) {
+                    item.appendChild(createInstructionsBlock(steps, collapsible, label));
                 }
-                item.appendChild(detailsEl);
+            }
+
+            if (detailItems.length > 0) {
+                item.appendChild(createDetailsBlock(detailItems, detailsCollapsible, detailsLabel));
             }
 
             if (offer.terms) {
@@ -621,6 +747,48 @@
                             "amount": "$50/$100",
                             "name": "Simmons Bank Checking Stackable ReferLive Referral",
                             "url": "https://io.referlive.com/F7JCX9"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Miscellaneous",
+            "sites": [
+                {
+                    "offers": [
+                        {
+                            "amount": "$110",
+                            "name": "Roots (Real Estate)",
+                            "url": "https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ",
+                            "requirements": "Make initial $100 investment.",
+                            "instructions": {
+                                "collapsible": true,
+                                "label": "Instructions",
+                                "steps": [
+                                    "Create your Roots account through my referral [link](https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ).",
+                                    {
+                                        "text": "Make your first $100 investment, then stack the promo codes below for additional bonus funding:",
+                                        "substeps": [
+                                            "My referral (applied automatically): $25 bonus",
+                                            "**EW25**: $25 bonus",
+                                            "**SEED25**: $25 bonus",
+                                            "**QUIZ10**: $10 bonus",
+                                            "**GROWWITHROOTS25**: $25 bonus"
+                                        ]
+                                    },
+                                    "In summary, a $100 deposit ends up as $210 invested in your account withdrawlable after 1 year."
+                                ]
+                            },
+                            "details": {
+                                "collapsible": true,
+                                "label": "Important Notes",
+                                "items": [
+                                    "Your deposit and bonus stay locked for one year; after that you can withdraw everything penalty-free.",
+                                    "Withdrawing before the year is up triggers an 8% penalty on your deposit and forfeits the bonus.",
+                                    "My take: the one-year hold is a little annoying, but with only $100 on the line it's an easy wait.  You'll also earn at least a 4% APY."
+                                ]
+                            }
                         }
                     ]
                 }
