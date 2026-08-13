@@ -145,6 +145,12 @@
             font-size: 0.96rem;
         }
 
+        .description {
+            color: var(--muted);
+            font-size: 0.92rem;
+            font-style: italic;
+        }
+
         .instructions-list {
             margin: 4px 0 0;
             padding-left: 20px;
@@ -501,6 +507,13 @@
                 topLine.appendChild(name);
             }
 
+            if (offer.description) {
+                const description = createElement("span", "description");
+                description.appendChild(document.createTextNode(" - "));
+                description.appendChild(linkifyText(offer.description));
+                topLine.appendChild(description);
+            }
+
             if (offer.tag) {
                 const normalized = offer.tag.toLowerCase();
                 const cssClass = normalized === "easy" ? "easy" : normalized === "moderate" ? "moderate" : "";
@@ -769,13 +782,14 @@
             ]
         },
         {
-            "title": "Miscellaneous",
+            "title": "Investing",
             "sites": [
                 {
                     "offers": [
                         {
                             "amount": "$110",
-                            "name": "Roots (Real Estate)",
+                            "name": "Roots",
+                            "description": "Investing in a portfolio of single-family rental homes.",
                             "url": "https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ",
                             "requirements": "Make initial $100 investment.",
                             "instructions": {
@@ -805,6 +819,18 @@
                                     "My take: the one-year hold is a little annoying, but with only $100 on the line it's an easy wait.  You'll also earn at least a 4% APY."
                                 ]
                             }
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$50",
+                            "name": "Groundfloor",
+                            "description": "Short-term real estate debt investing.",
+                            "url": "https://groundfloor.onelink.me/Jaqm/referral?code=o4d5c5&af_dp=groundfloor%3A%2F%2F&deep_link_value=referral_code&deep_link_sub1=o4d5c5",
+                            "requirements": "Make your first investment of $100 or more.",
+                            "details": "Shortest investment term is 30 days at around 5% APY."
                         }
                     ]
                 }
