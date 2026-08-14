@@ -164,15 +164,7 @@
             list-style: disc;
         }
 
-        details.instructions {
-            margin-top: 6px;
-            border: 1px solid #cfe0d6;
-            border-radius: 8px;
-            background: #f5faf7;
-            padding: 6px 10px;
-        }
-
-        details.collapsible-block {
+        details.offer-block {
             margin-top: 6px;
             border: 1px solid #ecd7a8;
             border-radius: 8px;
@@ -180,20 +172,13 @@
             padding: 6px 10px;
         }
 
-        details.instructions>summary {
-            cursor: pointer;
-            font-weight: 700;
-            color: #154f3a;
-        }
-
-        details.collapsible-block>summary {
+        details.offer-block>summary {
             cursor: pointer;
             font-weight: 700;
             color: #8a5a00;
         }
 
-        details.instructions[open]>summary,
-        details.collapsible-block[open]>summary {
+        details.offer-block[open]>summary {
             margin-bottom: 4px;
         }
 
@@ -322,7 +307,33 @@
 
     <script>
         // JSON shape: { emails?, sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
+        // Offer collapsibles use a "blocks" array; each block picks a "preset" (label + colors) and may override label/color.
         let emailsMap = {};
+
+        // Named block presets: label and colors defined once, referenced by "preset".
+        const BLOCK_PRESETS = {
+            instructions: {
+                label: "Instructions",
+                textColor: "#154f3a",
+                bgColor: "#f5faf7",
+                borderColor: "#cfe0d6",
+                ordered: true
+            },
+            instructions2: {
+                label: "Instructions",
+                textColor: "#126782",
+                bgColor: "#eef7fb",
+                borderColor: "#c6dde8",
+                ordered: true
+            },
+            notes: {
+                label: "Important Notes",
+                textColor: "#8a5a00",
+                bgColor: "#fdf7e8",
+                borderColor: "#ecd7a8",
+                ordered: false
+            }
+        };
 
         function getEmbeddedData() {
             const node = document.getElementById("offers-data");
@@ -419,74 +430,110 @@
             return title;
         }
 
-        function buildStepList(steps) {
-            const list = createElement("ol", "instructions-list");
-            steps.forEach(function (step) {
+        function buildBlockList(items, ordered) {
+            const list = createElement(ordered ? "ol" : "ul", ordered ? "instructions-list" : null);
+            if (!ordered) {
+                list.style.margin = "2px 0 0";
+                list.style.paddingLeft = "20px";
+            }
+            items.forEach(function (entry) {
                 const li = createElement("li");
-                if (step && typeof step === "object") {
-                    li.appendChild(linkifyText(step.text || ""));
-                    const substeps = Array.isArray(step.substeps) ? step.substeps : [];
+                if (entry && typeof entry === "object") {
+                    li.appendChild(linkifyText(entry.text || ""));
+                    const substeps = Array.isArray(entry.substeps) ? entry.substeps : [];
                     if (substeps.length > 0) {
                         const sub = createElement("ul", "instructions-sublist");
-                        substeps.forEach(function (entry) {
+                        substeps.forEach(function (subEntry) {
                             const subLi = createElement("li");
-                            subLi.appendChild(linkifyText(entry));
+                            subLi.appendChild(linkifyText(subEntry));
                             sub.appendChild(subLi);
                         });
                         li.appendChild(sub);
                     }
                 } else {
-                    li.appendChild(linkifyText(step));
+                    li.appendChild(linkifyText(entry));
                 }
                 list.appendChild(li);
             });
             return list;
         }
 
-        function createInstructionsBlock(steps, collapsible, label) {
-            if (collapsible) {
-                const details = createElement("details", "instructions");
-                const summary = createElement("summary", null, label);
+        function resolveBlock(block) {
+            const preset = (block.preset && BLOCK_PRESETS[block.preset]) ? BLOCK_PRESETS[block.preset] : {};
+            const items = Array.isArray(block.items)
+                ? block.items
+                : (Array.isArray(block.steps) ? block.steps : []);
+            return {
+                label: block.label || preset.label || "Details",
+                textColor: block.color || preset.textColor || "#8a5a00",
+                bgColor: block.bgColor || preset.bgColor || "#fdf7e8",
+                borderColor: block.borderColor || preset.borderColor || "#ecd7a8",
+                ordered: typeof block.ordered === "boolean" ? block.ordered : (preset.ordered === true),
+                collapsible: block.collapsible === true,
+                items: items
+            };
+        }
+
+        function createBlock(block) {
+            const resolved = resolveBlock(block);
+            if (resolved.items.length === 0) {
+                return null;
+            }
+            if (resolved.collapsible) {
+                const details = createElement("details", "offer-block");
+                details.style.borderColor = resolved.borderColor;
+                details.style.background = resolved.bgColor;
+                const summary = createElement("summary", null, resolved.label);
+                summary.style.color = resolved.textColor;
                 details.appendChild(summary);
-                details.appendChild(buildStepList(steps));
+                details.appendChild(buildBlockList(resolved.items, resolved.ordered));
                 return details;
             }
             const wrapper = createElement("div", "requirement");
-            wrapper.appendChild(createElement("em", null, label + ":"));
-            wrapper.appendChild(buildStepList(steps));
-            return wrapper;
-        }
-
-        function buildBulletList(items) {
-            const list = createElement("ul", null);
-            list.style.margin = "2px 0 0";
-            list.style.paddingLeft = "20px";
-            items.forEach(function (entry) {
-                const li = createElement("li");
-                li.appendChild(linkifyText(entry));
-                list.appendChild(li);
-            });
-            return list;
-        }
-
-        function createDetailsBlock(items, collapsible, label) {
-            if (collapsible) {
-                const details = createElement("details", "collapsible-block");
-                details.appendChild(createElement("summary", null, label));
-                details.appendChild(buildBulletList(items));
-                return details;
-            }
-            const wrapper = createElement("div", "requirement");
-            if (items.length === 1) {
+            const singleText = resolved.items.length === 1 && !(resolved.items[0] && typeof resolved.items[0] === "object");
+            if (singleText) {
                 const emphasis = createElement("em");
-                emphasis.appendChild(document.createTextNode(label + ": "));
-                emphasis.appendChild(linkifyText(items[0]));
+                emphasis.appendChild(document.createTextNode(resolved.label + ": "));
+                emphasis.appendChild(linkifyText(resolved.items[0]));
                 wrapper.appendChild(emphasis);
             } else {
-                wrapper.appendChild(createElement("em", null, label + ":"));
-                wrapper.appendChild(buildBulletList(items));
+                wrapper.appendChild(createElement("em", null, resolved.label + ":"));
+                wrapper.appendChild(buildBlockList(resolved.items, resolved.ordered));
             }
             return wrapper;
+        }
+
+        function collectOfferBlocks(offer) {
+            const blocks = [];
+            if (Array.isArray(offer.blocks)) {
+                offer.blocks.forEach(function (block) {
+                    blocks.push(block);
+                });
+            }
+            // Backward compatibility: fold legacy "instructions" and "details" fields into the block system.
+            if (offer.instructions) {
+                const instructions = offer.instructions;
+                const isArray = Array.isArray(instructions);
+                blocks.push({
+                    preset: "instructions",
+                    label: (!isArray && instructions.label) ? instructions.label : undefined,
+                    collapsible: !isArray && instructions.collapsible === true,
+                    items: isArray ? instructions : (Array.isArray(instructions.steps) ? instructions.steps : [])
+                });
+            }
+            if (offer.details) {
+                const detailsData = offer.details;
+                const isObject = detailsData && typeof detailsData === "object" && !Array.isArray(detailsData);
+                blocks.push({
+                    preset: "notes",
+                    label: (isObject && detailsData.label) ? detailsData.label : "Details",
+                    collapsible: isObject && detailsData.collapsible === true,
+                    items: Array.isArray(detailsData)
+                        ? detailsData
+                        : (isObject ? (Array.isArray(detailsData.items) ? detailsData.items : []) : [detailsData])
+                });
+            }
+            return blocks;
         }
 
         function createOfferItem(offer) {
@@ -524,14 +571,6 @@
             item.appendChild(topLine);
 
             const requirements = Array.isArray(offer.requirements) ? offer.requirements : (offer.requirements ? [offer.requirements] : []);
-            const detailsData = offer.details;
-            const detailItems = Array.isArray(detailsData)
-                ? detailsData
-                : (detailsData && typeof detailsData === "object"
-                    ? (Array.isArray(detailsData.items) ? detailsData.items : [])
-                    : (detailsData ? [detailsData] : []));
-            const detailsCollapsible = Boolean(detailsData) && !Array.isArray(detailsData) && typeof detailsData === "object" && detailsData.collapsible === true;
-            const detailsLabel = (detailsData && !Array.isArray(detailsData) && typeof detailsData === "object" && detailsData.label) ? detailsData.label : "Details";
 
             if (requirements.length > 0) {
                 const requirementsEl = createElement("div", "requirement");
@@ -556,21 +595,12 @@
                 item.appendChild(requirementsEl);
             }
 
-            if (offer.instructions) {
-                const instructions = offer.instructions;
-                const steps = Array.isArray(instructions)
-                    ? instructions
-                    : (Array.isArray(instructions.steps) ? instructions.steps : []);
-                const collapsible = !Array.isArray(instructions) && instructions.collapsible === true;
-                const label = (!Array.isArray(instructions) && instructions.label) ? instructions.label : "Instructions";
-                if (steps.length > 0) {
-                    item.appendChild(createInstructionsBlock(steps, collapsible, label));
+            collectOfferBlocks(offer).forEach(function (block) {
+                const blockEl = createBlock(block);
+                if (blockEl) {
+                    item.appendChild(blockEl);
                 }
-            }
-
-            if (detailItems.length > 0) {
-                item.appendChild(createDetailsBlock(detailItems, detailsCollapsible, detailsLabel));
-            }
+            });
 
             if (offer.terms) {
                 const terms = createElement("div", "requirement");
@@ -732,7 +762,7 @@
                 {
                     "offers": [
                         {
-                            "amount": "$500 or $1000",
+                            "amount": "$500/$1000",
                             "name": "Brex (Business)",
                             "url": "https://www.brex.com/signup?rc=Gq8GBCh",
                             "requirements": ["$500: Spend $5000 in first 30 days.", "$1000: Spend $5000 in first 30 days AND make two successful payroll transactions and two ACH payments within the first three months."],
@@ -774,8 +804,32 @@
                     "offers": [
                         {
                             "amount": "$50/$100",
-                            "name": "Simmons Bank Checking Stackable ReferLive Referral",
-                            "url": "https://io.referlive.com/F7JCX9"
+                            "name": "Simmons Bank",
+                            "url": "https://io.referlive.com/VqHsSR",
+                            "blocks": [
+                                {
+                                    "preset": "instructions",
+                                    "label": "$50 Consumer Checking Requirements",
+                                    "collapsible": true,
+                                    "items": [
+                                        "Register with the [referral link](https://io.referlive.com/VqHsSR).",
+                                        "Open a new eligible Consumer Checking account (stacks with official Simmons promotions).",
+                                        "Post at least 7 debit card transactions (excluding ATM/cash withdrawals) within 30 days of opening.",
+                                        "Receive at least one ACH deposit of $100 or more within 60 days of opening."
+                                    ]
+                                },
+                                {
+                                    "preset": "instructions2",
+                                    "label": "$100 Business Checking Requirements ",
+                                    "collapsible": true,
+                                    "items": [
+                                        "Register with the [referral link](https://io.referlive.com/VqHsSR).",
+                                        "Open a new eligible Business Checking account (stacks with official Simmons promotions).",
+                                        "Make at least $2,000 in cumulative deposits within 60 days of opening.",
+                                        "Post at least 10 transactions within 60 days of opening."
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }
