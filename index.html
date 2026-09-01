@@ -470,6 +470,7 @@
                 borderColor: block.borderColor || preset.borderColor || "#ecd7a8",
                 ordered: typeof block.ordered === "boolean" ? block.ordered : (preset.ordered === true),
                 collapsible: block.collapsible === true,
+                open: block.open === true,
                 items: items
             };
         }
@@ -481,6 +482,7 @@
             }
             if (resolved.collapsible) {
                 const details = createElement("details", "offer-block");
+                details.open = resolved.open;
                 details.style.borderColor = resolved.borderColor;
                 details.style.background = resolved.bgColor;
                 const summary = createElement("summary", null, resolved.label);
@@ -518,6 +520,7 @@
                     preset: "instructions",
                     label: (!isArray && instructions.label) ? instructions.label : undefined,
                     collapsible: !isArray && instructions.collapsible === true,
+                    open: !isArray && instructions.open === true,
                     items: isArray ? instructions : (Array.isArray(instructions.steps) ? instructions.steps : [])
                 });
             }
@@ -528,6 +531,7 @@
                     preset: "notes",
                     label: (isObject && detailsData.label) ? detailsData.label : "Details",
                     collapsible: isObject && detailsData.collapsible === true,
+                    open: isObject && detailsData.open === true,
                     items: Array.isArray(detailsData)
                         ? detailsData
                         : (isObject ? (Array.isArray(detailsData.items) ? detailsData.items : []) : [detailsData])
@@ -741,11 +745,12 @@
                             "requirements": "Deposit $1,000+",
                             "instructions": {
                                 "collapsible": true,
+                                "open": true,
                                 "label": "Instructions",
                                 "steps": [
                                     "Sign up with the referral [link](https://public.com/user-referral?referrer=Joshua50255).",
                                     "Initiate your first deposit of $1,000 or more.",
-                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) and manually enter the promo code **Joshua50255** to receive the bonus right away.",
+                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) (may need to click the small x in top right) and manually enter the promo code **Joshua50255** to receive the bonus right away.",
                                     "Choose which stock/ETF you want the bonus in (I chose VOO).",
                                     "Withdraw the $1,000 after it settles, and wait 12 months before selling the stock/ETF."
                                 ]
