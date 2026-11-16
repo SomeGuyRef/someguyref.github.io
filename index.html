@@ -87,6 +87,32 @@
             padding: 14px;
         }
 
+        .site-highlight,
+        .offer.offer-highlight {
+            border-color: #e58b50;
+            box-shadow: var(--shadow), 0 0 8px #f2c1a8;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+
+            .site-highlight,
+            .offer.offer-highlight {
+                animation: offer-glow 3s ease-in-out infinite;
+            }
+        }
+
+        @keyframes offer-glow {
+
+            0%,
+            100% {
+                box-shadow: var(--shadow), 0 0 5px #f2c1a8;
+            }
+
+            50% {
+                box-shadow: var(--shadow), 0 0 18px #e58b50;
+            }
+        }
+
         .site-title {
             margin: 0 0 10px;
             font-size: 1.24rem;
@@ -124,6 +150,12 @@
         .offer:first-child {
             border-top: none;
             padding-top: 0;
+        }
+
+        .offer.offer-highlight {
+            border: 1px solid #e58b50;
+            border-radius: 14px;
+            padding: 10px;
         }
 
         .offer-topline {
@@ -563,8 +595,11 @@
             return blocks;
         }
 
-        function createOfferItem(offer) {
+        function createOfferItem(offer, glowCard) {
             const item = createElement("li", "offer");
+            if (offer.glow && !glowCard) {
+                item.classList.add("offer-highlight");
+            }
             if (offer.id) {
                 item.id = offer.id;
             }
@@ -685,6 +720,11 @@
                 card.classList.add("site-portal");
             }
 
+            const glowCard = !site.name && Array.isArray(site.offers) && site.offers.length === 1 && site.offers[0].glow;
+            if (glowCard) {
+                card.classList.add("site-highlight");
+            }
+
             const title = createLinkedSiteTitle(site);
             if (title) {
                 card.appendChild(title);
@@ -698,7 +738,7 @@
                 const offersClass = isPortalWithOffers ? "offers portal-offers" : "offers";
                 const offers = createElement("ul", offersClass);
                 site.offers.forEach(function (offer) {
-                    offers.appendChild(createOfferItem(offer));
+                    offers.appendChild(createOfferItem(offer, glowCard));
                 });
                 card.appendChild(offers);
             }
@@ -841,6 +881,7 @@
                             "amount": "$300 + $417",
                             "name": "Chime",
                             "tag": "CHURNABLE",
+                            "glow": true,
                             "requirements": "$500+ direct deposit and debit card activation",
                             "blocks": [
                                 {
@@ -1227,6 +1268,20 @@
                             "url": "https://gemsloot.com/?aff=someguy",
                             "requirements": "Deposit and invest $150",
                             "details": "Hold time is 12 months.  Should be getting at least 4% APY though."
+                        }
+                    ]
+                },
+                {
+                    "name": "Kudos",
+                    "url": "https://joinkudos.go.link/fI1Lo?adj_label=PINE_KUDOS78",
+                    "offers": [
+                        {
+                            "amount": "$20",
+                            "name": "New User Offer",
+                            "url": "https://joinkudos.go.link/fI1Lo?adj_label=PINE_KUDOS78",
+                            "tag": "EASY",
+                            "requirements": "Install the Kudos extension and make a $30 purchase at a cashback store (e.g., eBay worked for me).",
+                            "details": "You do not need to sign up for Kudos Premium or add any credit cards."
                         }
                     ]
                 },
