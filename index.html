@@ -231,6 +231,12 @@
             border: 1px solid #efd7a4;
         }
 
+        .tag.churnable {
+            background: #fff0e8;
+            color: #a43d14;
+            border: 1px solid #f2c1a8;
+        }
+
         .note {
             margin: 6px 0 0;
             font-size: 0.9rem;
@@ -350,7 +356,7 @@
 
         function linkifyText(text) {
             const fragment = document.createDocumentFragment();
-            const pattern = /(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\])/g;
+            const pattern = /(\*\*[^*]+\*\*|__[^_]+__|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\]|\n)/g;
             let lastIndex = 0;
             let match;
             while ((match = pattern.exec(text)) !== null) {
@@ -362,6 +368,12 @@
                     const strong = createElement("strong");
                     strong.textContent = matched.slice(2, -2);
                     fragment.appendChild(strong);
+                } else if (matched.startsWith("__")) {
+                    const underline = createElement("u");
+                    underline.textContent = matched.slice(2, -2);
+                    fragment.appendChild(underline);
+                } else if (matched === "\n") {
+                    fragment.appendChild(createElement("br"));
                 } else if (matched.startsWith("[") && matched.indexOf("](") !== -1) {
                     const splitIndex = matched.indexOf("](");
                     const link = createElement("a");
@@ -440,25 +452,26 @@
             return title;
         }
 
-        function buildBlockList(items, ordered) {
-            const list = createElement(ordered ? "ol" : "ul", ordered ? "instructions-list" : null);
-            if (!ordered) {
+        function buildBlockList(items, ordered, nested) {
+            const list = createElement(ordered ? "ol" : "ul", nested ? "instructions-sublist" : (ordered ? "instructions-list" : null));
+            if (!ordered && !nested) {
                 list.style.margin = "2px 0 0";
                 list.style.paddingLeft = "20px";
             }
             items.forEach(function (entry) {
                 const li = createElement("li");
                 if (entry && typeof entry === "object") {
-                    li.appendChild(linkifyText(entry.text || ""));
+                    const text = linkifyText(entry.text || "");
+                    if (entry.small) {
+                        const small = createElement("small");
+                        small.appendChild(text);
+                        li.appendChild(small);
+                    } else {
+                        li.appendChild(text);
+                    }
                     const substeps = Array.isArray(entry.substeps) ? entry.substeps : [];
                     if (substeps.length > 0) {
-                        const sub = createElement("ul", "instructions-sublist");
-                        substeps.forEach(function (subEntry) {
-                            const subLi = createElement("li");
-                            subLi.appendChild(linkifyText(subEntry));
-                            sub.appendChild(subLi);
-                        });
-                        li.appendChild(sub);
+                        li.appendChild(buildBlockList(substeps, false, true));
                     }
                 } else {
                     li.appendChild(linkifyText(entry));
@@ -552,15 +565,19 @@
 
         function createOfferItem(offer) {
             const item = createElement("li", "offer");
+            if (offer.id) {
+                item.id = offer.id;
+            }
             const topLine = createElement("div", "offer-topline");
 
             const amount = createElement("span", "amount", offer.amount || "");
             const name = createElement("span", "name", offer.name || "");
             const offerId = slugify(offer.name);
+            const offerUrl = offer.url || (Array.isArray(offer.links) && offer.links.length === 1 ? offer.links[0].url : "");
 
-            if (offer.url) {
+            if (offerUrl) {
                 const link = createElement("a");
-                link.href = offer.url;
+                link.href = offerUrl;
                 link.dataset.gc = offerId;
                 link.appendChild(amount);
                 link.appendChild(name);
@@ -579,8 +596,8 @@
 
             if (offer.tag) {
                 const normalized = offer.tag.toLowerCase();
-                const cssClass = normalized === "easy" ? "easy" : normalized === "moderate" ? "moderate" : "";
-                const tag = createElement("span", "tag " + cssClass, offer.tag);
+                const cssClass = ["easy", "moderate", "churnable"].includes(normalized) ? normalized : "";
+                const tag = createElement("span", "tag " + cssClass, normalized === "churnable" ? "🔥 CHURNABLE 🔥" : offer.tag);
                 topLine.appendChild(tag);
             }
 
@@ -609,6 +626,22 @@
                     requirementsEl.appendChild(list);
                 }
                 item.appendChild(requirementsEl);
+            }
+
+            if (offer.detailAnchor) {
+                const details = createElement("div", "requirement");
+                const link = createElement("a", null, "Chime Bonus Stack Details");
+                link.href = "#" + offer.detailAnchor;
+                link.target = "_self";
+                link.addEventListener("click", function () {
+                    const target = document.getElementById(offer.detailAnchor);
+                    const instructions = target && target.querySelector("details");
+                    if (instructions) {
+                        instructions.open = true;
+                    }
+                });
+                details.appendChild(link);
+                item.appendChild(details);
             }
 
             collectOfferBlocks(offer).forEach(function (block) {
@@ -767,6 +800,7 @@
                             "amount": "$100",
                             "name": "Public Brokerage",
                             "url": "https://public.com/user-referral?referrer=Joshua48361",
+                            "tag": "EASY",
                             "requirements": "Deposit $1,000+",
                             "instructions": {
                                 "collapsible": true,
@@ -781,6 +815,17 @@
 									"Wait 12 months before selling the stock/ETF and withdrawing."
                                 ]
                             }
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$80",
+                            "name": "Capital One Shopping",
+                            "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
+                            "tag": "EASY",
+                            "requirements": "Install the desktop or mobile extension within 7 days of account creation and leave it installed for 90 days. No purchase necessary. Can uninstall early once receive bonus."
                         }
                     ]
                 }
@@ -819,6 +864,82 @@
                 {
                     "offers": [
                         {
+                            "id": "chime-bonus-stack",
+                            "amount": "$300 + $417",
+                            "name": "Chime",
+                            "tag": "CHURNABLE",
+                            "requirements": "$500+ direct deposit and debit card activation",
+                            "blocks": [
+                                {
+                                    "preset": "instructions",
+                                    "label": "Chime Bonus Stack Instructions",
+                                    "collapsible": true,
+                                    "items": [
+                                        {
+                                            "text": "Open my [Chime referral link](https://www.chime.com/r/terrellwhite/?c=s) in one tab and leave it open without signing up.",
+                                            "substeps": [
+                                                {
+                                                    "text": "Chrome Incognito is recommended. On a desktop or laptop, you may need to verify your identity with a webcam, so make sure you it works well first or sign up on a mobile device.",
+                                                    "small": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "text": "In a new tab (in the same browser window), activate your chosen cashback offer and signup through the Chime page it opens:",
+                                            "substeps": [
+                                                {
+                                                    "text": "Offer Walls",
+                                                    "substeps": [
+                                                        {
+                                                            "text": "*Recommended: Don't repeat offers through the same offer wall across portals; doing so may risk denied payment or account closure. Some portals offer multiple offer walls, so plan accordingly.",
+                                                            "small": true
+                                                        },
+                                                        "[CashInStyle - $417 (RevU)](https://cashinstyle.com/walls/offers/43788477/chime-200-direct-deposit?ref=someguyref)",
+                                                        "[GemsLoot - $390 (RevU)](https://gemsloot.com/?aff=someguy)",
+                                                        "[Earnopolis - $273 (PrimeEarn or RevU)](https://earnopolis.com/r/?r=magnetic-dionysus-0lvgl)"
+                                                    ]
+                                                },
+                                                "[KashKick - $260](https://app.kashkick.com/?offer-id=rDXOWNpqI0qs&ref=NtGaBW3hSh3A)",
+                                                {
+                                                    "text": "Prodege Portals",
+                                                    "substeps": [
+                                                        {
+                                                            "text": "*Use a unique email for each of these Prodege portals.",
+                                                            "small": true
+                                                        },
+                                                        "[InboxDollars - $210](https://www.inboxdollars.com/?rb=4ERIESb2eX5aWUPJ&rp=1)",
+                                                        "[MyPoints - $180](https://www.mypoints.com/?rb=j9ngKDnBZQ9EvRvE&rp=1)",
+                                                        "[Upromise - $146](https://www.upromise.com/?rb=qKKwI4AtE5fv7W00&rp=1)",
+                                                        "[Swagbucks - $140](https://www.swagbucks.com/profile/r_ldUsHQWKBQeVjffj?rp=1)"
+                                                    ]
+                                                },
+                                                "[TopCashBack - $100](https://www.topcashback.com/ref/somethingusername)"
+                                            ]
+                                        },
+                                        "After entering your email on the offer signup page, check that the referral bonus is shown. This confirms the referral was applied.",
+                                        "During signup, select __\"postal mail\"__ when asked how you heard about Chime, and enter promo code **PAID200**.",
+                                        "Receving a direct deposit of $500+ within 30 days instantly triggers the $200 PAID200 bonus and satisfies part of the referral requirements.",
+                                        "Activate your physical Chime debit card within 14 days of the qualifying deposit to meet the referral requirement.",
+                                        "Should see the cashback offer tracking in your portal a couple days after signing up or after the direct deposit lands. Confirm there are not additional requirements for the specific cashback offer."
+                                    ]
+                                },
+                                {
+                                    "preset": "notes",
+                                    "label": "Churning Notes",
+                                    "collapsible": true,
+                                    "items": [
+                                        "I generally keep the account open until I cash out the portal rewards, but some have reported success closing the Chime account as soon as the portal tracks.",
+                                        "After closing a Chime account, wait at least four weeks before opening again and use a different email address with a different cashback portal.",
+                                        "Referral and PAID200 bonus can be churned each time."
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
                             "amount": "$500/$1000",
                             "name": "Brex (Business)",
                             "url": "https://www.brex.com/signup?rc=Gq8GBCh",
@@ -833,6 +954,7 @@
                             "amount": "$55",
                             "name": "MoneyLion",
                             "url": "https://mlion.us/$Someguyref",
+                            "tag": "EASY",
                             "requirements": "DD $100"
                         }
                     ]
@@ -843,6 +965,7 @@
                             "amount": "$100",
                             "name": "Varo",
                             "url": "https://www.varomoney.com/r3/?r=Joshua32277",
+                            "tag": "EASY",
                             "requirements": "DD $500 within 45 days"
                         }
                     ]
@@ -853,6 +976,7 @@
                             "amount": "$50",
                             "name": "OnePay",
                             "url": "https://web.onepay.com/wlink/refer-a-friend?product=one_banking&referral_code=Sqfk8SWSG&referrer_campaign_id=campaign.8e50139f-839f-4274-ba41-dd991a0b0eb6",
+                            "tag": "EASY",
                             "requirements": "DD $500"
                         }
                     ]
@@ -970,18 +1094,64 @@
                     "url": "https://cashinstyle.com/?ref=someguyref",
                     "offers": [
                         {
-                            "amount": "$407",
+                            "amount": "$417",
                             "name": "Chime",
+                            "detailAnchor": "chime-bonus-stack",
                             "requirements": "Direct Deposit $200",
                             "links": [
                                 {
                                     "label": "All Platforms",
-                                    "url": "https://cashinstyle.com/walls/offers/41580426?ref=someguyref"
+                                    "url": "https://cashinstyle.com/walls/offers/43788477/chime-200-direct-deposit?ref=someguyref"
                                 }
                             ]
                         },
                         {
-                            "amount": "$61",
+                            "amount": "$275",
+                            "name": "SoFi Checking and Savings",
+                            "requirements": "Make a direct deposit of $350",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/42648119/sofi-checking-and-savings-register-350-direct-deposit-multi?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$83",
+                            "name": "SoFi Invest",
+                            "requirements": "Deposit $25",
+                            "links": [
+                                {
+                                    "label": "Desktop",
+                                    "url": "https://cashinstyle.com/walls/offers/43312681/sofi-active-invest-activate-new-account?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$70",
+                            "name": "Webull",
+                            "requirements": "Sign up, deposit $100 or more, and make a trade",
+                            "links": [
+                                {
+                                    "label": "All Platforms",
+                                    "url": "https://cashinstyle.com/walls/offers/43307701/webull?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$66",
+                            "name": "The Farmer's Dog",
+                            "requirements": "Place order, smallest is $17",
+                            "tag": "EASY",
+                            "links": [
+                                {
+                                    "label": "All Platforms",
+                                    "url": "https://cashinstyle.com/walls/offers/40539958?ref=someguyref"
+                                }
+                            ]
+                        },
+                        {
+                            "amount": "$52",
                             "name": "FanDuel Sportsbook",
                             "requirements": "Deposit $10",
                             "tag": "EASY",
@@ -997,41 +1167,18 @@
                             ]
                         },
                         {
-                            "amount": "$70",
-                            "name": "SoFi Invest",
-                            "requirements": "Deposit $25",
-                            "links": [
-                                {
-                                    "label": "Desktop",
-                                    "url": "https://cashinstyle.com/walls/offers/41823065?ref=someguyref"
-                                }
-                            ]
-                        },
-                        {
-                            "amount": "$240",
-                            "name": "SoFi Checking and Savings",
-                            "requirements": "Direct Deposit $200+",
-                            "links": [
-                                {
-                                    "label": "Desktop",
-                                    "url": "https://cashinstyle.com/walls/offers/39478595?ref=someguyref"
-                                }
-                            ]
-                        },
-                        {
-                            "amount": "$74",
-                            "name": "The Farmer's Dog",
-                            "requirements": "Place order, smallest is $17",
-                            "tag": "EASY",
+                            "amount": "$50",
+                            "name": "Acorns",
+                            "requirements": "Open a new account and set up a recurring deposit of $5 or more",
                             "links": [
                                 {
                                     "label": "All Platforms",
-                                    "url": "https://cashinstyle.com/walls/offers/40539958?ref=someguyref"
+                                    "url": "https://cashinstyle.com/walls/offers/36069738/acorns?ref=someguyref"
                                 }
                             ]
                         },
                         {
-                            "amount": "$25",
+                            "amount": "$22",
                             "name": "Uphold",
                             "requirements": "Make first trade",
                             "links": [
@@ -1044,8 +1191,23 @@
                     ]
                 },
                 {
-                    "name": "TopCashBack",
-                    "url": "https://www.topcashback.com/ref/somethingusername"
+                    "name": "KashKick",
+                    "url": "https://app.kashkick.com?ref=NtGaBW3hSh3A",
+                    "offers": [
+                        {
+                            "amount": "$260",
+                            "name": "Chime",
+                            "url": "https://app.kashkick.com/?offer-id=rDXOWNpqI0qs&ref=NtGaBW3hSh3A",
+                            "detailAnchor": "chime-bonus-stack",
+                            "requirements": "Receive a $200 direct deposit within 90 days"
+                        },
+                        {
+                            "amount": "$125",
+                            "name": "OnePay",
+                            "url": "https://app.kashkick.com/?offer-id=beqIJNVILqxW&ref=NtGaBW3hSh3A",
+                            "requirements": "Receive a $500 direct deposit"
+                        }
+                    ]
                 },
                 {
                     "name": "GemsLoot",
@@ -1053,35 +1215,28 @@
                     "note": "Search for these offers after signup:",
                     "offers": [
                         {
-                            "amount": "$350",
+                            "amount": "$390",
                             "name": "Chime",
+                            "url": "https://gemsloot.com/?aff=someguy",
+                            "detailAnchor": "chime-bonus-stack",
                             "requirements": "Direct Deposit $200"
                         },
                         {
-                            "amount": "$147",
-                            "name": "Airwallex",
-                            "requirements": "Open business checking, make any transaction (ie. transfer, micro deposits)"
-                        },
-                        {
-                            "amount": "$72",
+                            "amount": "$86",
                             "name": "Ark7",
+                            "url": "https://gemsloot.com/?aff=someguy",
                             "requirements": "Deposit and invest $150",
                             "details": "Hold time is 12 months.  Should be getting at least 4% APY though."
                         }
                     ]
                 },
                 {
-                    "name": "InboxDollars",
-                    "url": "https://www.inboxdollars.com?rb=207544411"
+                    "name": "TopCashBack",
+                    "url": "https://www.topcashback.com/ref/somethingusername"
                 },
                 {
-                    "offers": [
-                        {
-                            "amount": "$80",
-                            "name": "CapitalOne Shopping",
-                            "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96"
-                        }
-                    ]
+                    "name": "InboxDollars",
+                    "url": "https://www.inboxdollars.com?rb=207544411"
                 }
             ]
         }
