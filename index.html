@@ -27,11 +27,14 @@
 
         body {
             margin: 0;
+            min-height: 100vh;
             color: var(--ink);
             background:
                 radial-gradient(circle at 12% 8%, #fff6dd 0%, transparent 30%),
                 radial-gradient(circle at 90% 15%, #d8f0ff 0%, transparent 30%),
                 linear-gradient(150deg, var(--bg-1), var(--bg-2));
+            background-color: var(--bg-2);
+            background-repeat: no-repeat;
             font-family: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
             line-height: 1.45;
         }
@@ -40,6 +43,25 @@
             max-width: 980px;
             margin: 0 auto;
             padding: 28px 16px 40px;
+        }
+
+        .page-end-space {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 0;
+            overflow: hidden;
+            text-align: center;
+            color: var(--muted);
+            opacity: 0.25;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .page-end-space[hidden] {
+            display: none;
         }
 
         .hero {
@@ -64,14 +86,355 @@
 
         .section {
             margin-top: 24px;
+            scroll-margin-top: calc(var(--section-nav-height, 90px) + 10px);
             animation: rise-in 420ms ease-out;
         }
 
+        .offer {
+            scroll-margin-top: calc(var(--section-nav-height, 90px) + 10px);
+        }
+
+        .site-portal {
+            scroll-margin-top: calc(var(--section-nav-height, 90px) - 5px);
+        }
+
+        .site-portal .offer {
+            scroll-margin-top: calc(var(--section-nav-height, 90px) - 13px);
+        }
+
+        .scroll-timeline {
+            --timeline-space: max(14px, calc((100vw - 980px) / 2 - 18px));
+            position: fixed;
+            z-index: 20;
+            right: 6px;
+            top: calc(var(--section-nav-height, 90px) + 8px);
+            bottom: 8px;
+            width: var(--timeline-space);
+            display: flex;
+            flex-direction: column;
+            color: var(--accent-2);
+            pointer-events: none;
+        }
+
+        .scroll-timeline-tick {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            align-self: flex-end;
+            flex: 1;
+            min-height: 0;
+            width: max-content;
+            max-width: 100%;
+            min-width: 14px;
+            padding-right: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .scroll-timeline-full-hover .scroll-timeline-tick {
+            pointer-events: none;
+        }
+
+        .scroll-timeline-full-hover .scroll-timeline-label {
+            pointer-events: none;
+        }
+
+        .scroll-timeline-full-hover .scroll-timeline-tick::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: min(var(--timeline-space), calc(var(--timeline-trigger-width, 14px) + 100px));
+            pointer-events: auto;
+        }
+
+        .scroll-timeline-full-hover .scroll-timeline-label {
+            align-self: stretch;
+        }
+
+        .scroll-timeline:not(.scroll-timeline-full-hover) .scroll-timeline-tick {
+            pointer-events: none;
+        }
+
+        .scroll-timeline-tick::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 1px;
+            background: currentColor;
+            opacity: 0.24;
+            pointer-events: auto;
+        }
+
+        .scroll-timeline-section::before {
+            content: none;
+        }
+
+        .scroll-timeline-section {
+            padding-right: 0;
+        }
+
+        .scroll-timeline-section .scroll-timeline-label {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .scroll-timeline-section .scroll-timeline-description {
+            max-width: none;
+            opacity: 1;
+        }
+
+        .scroll-timeline-tick:hover::before,
+        .scroll-timeline-tick:focus-visible::before {
+            opacity: 1;
+        }
+
+        .scroll-timeline-tick[aria-current="location"]::before {
+            height: 2px;
+            opacity: 0.9;
+        }
+
+        .scroll-timeline-tick[aria-current="location"] .scroll-timeline-label {
+            opacity: 0.9;
+        }
+
+        .scroll-timeline-tick:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+        }
+
+        .scroll-timeline-label {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            white-space: nowrap;
+            color: inherit;
+            font-size: 0.8rem;
+            pointer-events: auto;
+            opacity: 0.4;
+        }
+
+        .scroll-timeline-tick:hover .scroll-timeline-label,
+        .scroll-timeline-tick:focus-visible .scroll-timeline-label {
+            opacity: 1;
+        }
+
+        .scroll-timeline-description {
+            min-width: 0;
+            max-width: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .scroll-timeline-description > span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .scroll-timeline-amount {
+            flex-shrink: 0;
+        }
+
+        .scroll-timeline-tick:hover .scroll-timeline-description,
+        .scroll-timeline-tick:focus-visible .scroll-timeline-description {
+            max-width: 320px;
+            opacity: 1;
+        }
+
+        .scroll-timeline-amount + .scroll-timeline-description > span {
+            padding-left: 6px;
+        }
+
+        .scroll-timeline-hover-amount {
+            display: none;
+        }
+
+        .scroll-timeline-compact .scroll-timeline-amount {
+            display: none;
+        }
+
+        .scroll-timeline-compact .scroll-timeline-hover-amount {
+            display: inline;
+        }
+
+        .scroll-timeline-compact .scroll-timeline-section {
+            flex: 0 0 var(--timeline-section-height);
+        }
+
+        .scroll-timeline-compact .scroll-timeline-amount + .scroll-timeline-description > span {
+            padding-left: 0;
+        }
+
+        .scroll-timeline-too-short {
+            display: none;
+        }
+
+        .section-nav-sentinel {
+            height: 1px;
+            margin-bottom: -1px;
+        }
+
+        .section-nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            isolation: isolate;
+            margin: 12px 0 0;
+            padding: 6px 0;
+        }
+
+        .section-nav::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 50%;
+            width: 100vw;
+            transform: translateX(-50%);
+            z-index: -1;
+            background: var(--bg-2);
+            box-shadow: var(--shadow);
+            opacity: 0;
+        }
+
+        .section-nav.is-stuck::before,
+        .section-nav.is-stuck .section-nav-image {
+            opacity: 1;
+        }
+
+        .section-nav-content {
+            position: relative;
+            width: max-content;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .section-nav-image {
+            position: absolute;
+            right: calc(100% + 12px);
+            top: 0;
+            height: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            border-radius: 8px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .section-nav + .section {
+            margin-top: 4px;
+        }
+
+        .section-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 20px;
+        }
+
+        .section-nav-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            text-underline-offset: 3px;
+        }
+
+        .section-nav-link:focus-visible {
+            outline: 3px solid var(--accent-2);
+            outline-offset: 2px;
+        }
+
+        .section-contact {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2rem;
+            gap: 8px;
+            margin-top: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .section-contact-icon {
+            color: var(--accent-2);
+            font-size: 1.3rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .section-contact > a {
+            transform: translateY(-3px);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .section-contact-reveal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border: 0;
+            padding: 0;
+            background: none;
+            cursor: pointer;
+        }
+
+        .section-contact-reveal:focus-visible {
+            outline: 3px solid var(--accent-2);
+            outline-offset: 2px;
+        }
+
         .section h2 {
-            margin: 0 0 12px;
+            margin: 0;
             font-size: clamp(1.35rem, 3.7vw, 1.8rem);
+        }
+
+        .section-disclosure > summary {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
             border-bottom: 3px solid #a8c7b5;
             padding-bottom: 6px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .section-disclosure > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .section-disclosure > summary::before {
+            content: "";
+            color: var(--accent-2);
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            margin: 0 4px;
+            border-right: 4px solid currentColor;
+            border-bottom: 4px solid currentColor;
+            transform: rotate(-45deg);
+        }
+
+        .section-disclosure > summary[aria-expanded="true"]::before {
+            transform: translateY(-4px) rotate(45deg);
+        }
+
+        .section-disclosure > summary:focus-visible {
+            outline: 3px solid var(--accent-2);
+            outline-offset: 4px;
         }
 
         .site-grid {
@@ -95,6 +458,28 @@
 
         @media (prefers-reduced-motion: no-preference) {
 
+            html {
+                scroll-behavior: smooth;
+            }
+
+            .scroll-timeline-tick::before,
+            .scroll-timeline-label {
+                transition: opacity 150ms ease;
+            }
+
+            .scroll-timeline-description {
+                transition: max-width 240ms ease, opacity 180ms ease;
+            }
+
+            .section-nav::before,
+            .section-nav-image {
+                transition: opacity 200ms ease;
+            }
+
+            .section-disclosure > summary::before {
+                transition: transform 240ms ease;
+            }
+
             .site-highlight,
             .offer.offer-highlight {
                 animation: offer-glow 3s ease-in-out infinite;
@@ -115,18 +500,16 @@
 
         .site-title {
             margin: 0 0 10px;
-            font-size: 1.24rem;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
             font-weight: 800;
             color: #0f4f65;
-            background: #e7f2f8;
-            border: 1px solid #c6dde8;
-            border-left: 6px solid #126782;
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-bottom: 3px solid #a8c7b5;
+            padding-bottom: 6px;
         }
 
         .site-title a {
             color: inherit;
+            text-decoration: none;
         }
 
         .portal-offers {
@@ -320,7 +703,17 @@
             }
         }
 
+        @media (max-width: 1349.98px) {
+            .scroll-timeline {
+                display: none;
+            }
+        }
+
         @media (max-width: 620px) {
+            .section-nav-image {
+                display: none;
+            }
+
             .site {
                 padding: 12px;
             }
@@ -345,9 +738,14 @@
     </main>
 
     <script>
+        // Offers may define offerId and be reused with { offerRef: "offer-id" } in another section.
+        // Set timelineFullRowHover: false at the JSON root to limit hover to ticks and text.
+        // Offer flags hideTimelineAmount and hideTimelineHoverLabel independently hide static amounts and hover labels.
+        // Sections are open by default; set "collapsed": true on a section to start it closed.
         // JSON shape: { emails?, sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
         // Offer collapsibles use a "blocks" array; each block picks a "preset" (label + colors) and may override label/color.
         let emailsMap = {};
+        const sectionAnimations = new WeakMap();
 
         // Named block presets: label and colors defined once, referenced by "preset".
         const BLOCK_PRESETS = {
@@ -386,6 +784,32 @@
             }
         }
 
+        function createEmailReveal(encoded, iconOnly) {
+            const button = createElement("button", iconOnly ? "section-contact-reveal" : "reveal-email");
+            button.type = "button";
+            let icon;
+            if (iconOnly) {
+                button.setAttribute("aria-label", "Show email address");
+                icon = createElement("span", "section-contact-icon", "\u2709");
+                icon.setAttribute("aria-hidden", "true");
+                button.appendChild(icon);
+            } else {
+                button.textContent = "show email";
+            }
+            button.addEventListener("click", function () {
+                const email = atob(encoded);
+                const link = createElement("a", null, email);
+                link.href = "mailto:" + email;
+                if (icon) {
+                    button.replaceWith(icon, link);
+                } else {
+                    button.replaceWith(link);
+                }
+                link.focus();
+            });
+            return button;
+        }
+
         function linkifyText(text) {
             const fragment = document.createDocumentFragment();
             const pattern = /(\*\*[^*]+\*\*|__[^_]+__|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\]|\n)/g;
@@ -418,17 +842,7 @@
                     if (!encoded) {
                         fragment.appendChild(document.createTextNode(matched));
                     } else {
-                        const button = document.createElement("button");
-                        button.className = "reveal-email";
-                        button.textContent = "show email";
-                        button.addEventListener("click", function () {
-                            const email = atob(encoded);
-                            const link = createElement("a");
-                            link.href = "mailto:" + email;
-                            link.textContent = email;
-                            button.parentNode.replaceChild(link, button);
-                        });
-                        fragment.appendChild(button);
+                        fragment.appendChild(createEmailReveal(encoded, false));
                     }
                 } else {
                     const link = createElement("a");
@@ -465,6 +879,265 @@
                 .replace(/&/g, " and ")
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-+|-+$/g, "");
+        }
+
+        function collectReusableOffers(sections) {
+            const offersById = new Map();
+            (sections || []).forEach(function (section) {
+                (section.sites || []).forEach(function (site) {
+                    (site.offers || []).forEach(function (offer) {
+                        if (!offer || typeof offer !== "object" || Array.isArray(offer) ||
+                            Object.prototype.hasOwnProperty.call(offer, "offerRef")) {
+                            return;
+                        }
+                        if (typeof offer.offerId !== "string" || !offer.offerId.trim()) {
+                            return;
+                        }
+                        const offerId = offer.offerId.trim();
+                        if (offersById.has(offerId)) {
+                            throw new Error("Duplicate offerId: " + offerId);
+                        }
+                        offersById.set(offerId, offer);
+                    });
+                });
+            });
+            return offersById;
+        }
+
+        function resolveOfferEntry(entry, offersById) {
+            if (!entry || typeof entry !== "object" || Array.isArray(entry) ||
+                !Object.prototype.hasOwnProperty.call(entry, "offerRef")) {
+                return { offer: entry, isReference: false };
+            }
+            if (typeof entry.offerRef !== "string" || !entry.offerRef.trim()) {
+                throw new Error("Offer references must have a non-empty offerRef.");
+            }
+            const offerId = entry.offerRef.trim();
+            const offer = offersById.get(offerId);
+            if (!offer) {
+                throw new Error("Unknown offerRef: " + offerId);
+            }
+            return { offer: offer, isReference: true };
+        }
+
+        function createTableOfContents(sections) {
+            const titles = ["Bank Offers", "Cashback Portals", "Investing Offers"];
+            const matchingSections = (sections || []).filter(function (section) {
+                return titles.indexOf(section.title) !== -1;
+            });
+            if (matchingSections.length === 0) {
+                return null;
+            }
+
+            const nav = createElement("nav", "section-nav");
+            nav.setAttribute("aria-label", "Offer sections");
+            const navContent = createElement("div", "section-nav-content");
+            const heroImage = document.querySelector(".hero-image");
+            if (heroImage) {
+                const image = createElement("img", "section-nav-image");
+                image.src = heroImage.getAttribute("src");
+                image.alt = "";
+                image.addEventListener("error", function () {
+                    image.hidden = true;
+                });
+                navContent.appendChild(image);
+            }
+            const links = createElement("div", "section-nav-links");
+            matchingSections.forEach(function (section) {
+                const link = createElement("a", "section-nav-link", section.title);
+                link.href = "#section-" + slugify(section.title);
+                link.target = "_self";
+                link.addEventListener("click", function () {
+                    openSectionFromHash(link.hash);
+                });
+                links.appendChild(link);
+            });
+            navContent.appendChild(links);
+            const contact = createElement("div", "section-contact");
+            if (emailsMap.default) {
+                contact.appendChild(createEmailReveal(emailsMap.default, true));
+            }
+            navContent.appendChild(contact);
+            nav.appendChild(navContent);
+            return nav;
+        }
+
+        function initializeStickyNavigation(nav, sentinel) {
+            const observer = new IntersectionObserver(function (entries) {
+                nav.classList.toggle("is-stuck", entries[0].boundingClientRect.top < 0);
+            });
+            observer.observe(sentinel);
+
+            const resizeObserver = new ResizeObserver(function () {
+                document.documentElement.style.setProperty("--section-nav-height", nav.offsetHeight + 12 + "px");
+            });
+            resizeObserver.observe(nav);
+            document.documentElement.style.setProperty("--section-nav-height", nav.offsetHeight + 12 + "px");
+        }
+
+        function initializeScrollTimeline(container, fullRowHover, updatePageEndSpace) {
+            const targets = Array.from(container.querySelectorAll(".section, [data-scroll-title]"));
+            if (targets.length === 0) {
+                return;
+            }
+            const scrollTargets = targets.map(function (target) {
+                const portal = target.closest(".site-portal");
+                return portal && portal.querySelector(".offer") === target ? portal : target;
+            });
+            const nav = createElement("nav", "scroll-timeline");
+            nav.classList.toggle("scroll-timeline-full-hover", fullRowHover);
+            nav.setAttribute("aria-label", "Offer scroll timeline");
+            const ticks = targets.map(function (target, index) {
+                const isSection = target.classList.contains("section");
+                const scrollTarget = scrollTargets[index];
+                if (!scrollTarget.id) {
+                    scrollTarget.id = "offer-position-" + index;
+                }
+                const title = isSection
+                    ? target.querySelector("h2").textContent
+                    : target.dataset.scrollTitle;
+                const amount = target.dataset.scrollAmount || "";
+                const label = [amount, title].filter(Boolean).join(" ");
+                const link = createElement("a", "scroll-timeline-tick" + (isSection ? " scroll-timeline-section" : ""));
+                link.href = "#" + scrollTarget.id;
+                link.target = "_self";
+                link.setAttribute("aria-label", label);
+                const text = createElement("span", "scroll-timeline-label");
+                text.setAttribute("aria-hidden", "true");
+                const showStaticAmount = amount && target.dataset.hideTimelineAmount !== "true";
+                if (showStaticAmount) {
+                    text.appendChild(createElement("span", "scroll-timeline-amount", amount));
+                }
+                if (isSection || target.dataset.hideTimelineHoverLabel !== "true") {
+                    const description = createElement("span", "scroll-timeline-description");
+                    const descriptionText = createElement("span");
+                    if (showStaticAmount) {
+                        descriptionText.appendChild(createElement("span", "scroll-timeline-hover-amount", amount + " "));
+                    }
+                    descriptionText.appendChild(document.createTextNode(showStaticAmount ? title : label));
+                    description.appendChild(descriptionText);
+                    text.appendChild(description);
+                }
+                link.appendChild(text);
+                link.addEventListener("click", function (event) {
+                    if (isSection && window.location.hash === link.hash) {
+                        const disclosure = target.querySelector(".section-disclosure");
+                        if (disclosure.querySelector("summary").getAttribute("aria-expanded") === "true") {
+                            event.preventDefault();
+                            setSectionExpanded(disclosure, false, true);
+                            return;
+                        }
+                    }
+                    openSectionFromHash(link.hash);
+                });
+                nav.appendChild(link);
+                return link;
+            });
+            document.body.appendChild(nav);
+
+            let scheduled = false;
+            let activeIndex = -1;
+            function updateDensity() {
+                const style = getComputedStyle(nav);
+                const availableHeight = window.innerHeight - parseFloat(style.top) - parseFloat(style.bottom);
+                const labelHeight = parseFloat(getComputedStyle(nav.querySelector(".scroll-timeline-label")).lineHeight);
+                const sectionCount = nav.querySelectorAll(".scroll-timeline-section").length;
+                const sectionHeight = labelHeight + 8;
+                const minimumHeight = sectionCount * sectionHeight + (targets.length - sectionCount) * 4;
+                nav.style.setProperty("--timeline-section-height", sectionHeight + "px");
+                nav.classList.toggle("scroll-timeline-compact", availableHeight < targets.length * (labelHeight + 4));
+                nav.classList.toggle("scroll-timeline-too-short", availableHeight < minimumHeight);
+                ticks.forEach(function (tick) {
+                    const amount = tick.querySelector(".scroll-timeline-amount");
+                    const width = tick.classList.contains("scroll-timeline-section")
+                        ? tick.querySelector(".scroll-timeline-label").scrollWidth
+                        : (amount ? amount.offsetWidth : 0) + 14;
+                    tick.style.setProperty("--timeline-trigger-width", width + "px");
+                });
+                updatePageEndSpace();
+            }
+
+            function updatePosition() {
+                scheduled = false;
+                if (nav.getClientRects().length === 0) {
+                    return;
+                }
+                // Match the anchor's scroll offset, not the middle of the viewport.
+                const readingLine = parseFloat(getComputedStyle(targets[0]).scrollMarginTop) + 2;
+                let currentIndex = 0;
+                scrollTargets.forEach(function (target, index) {
+                    if (target.getClientRects().length > 0 && target.getBoundingClientRect().top <= readingLine) {
+                        currentIndex = index;
+                    }
+                });
+                if (currentIndex !== activeIndex) {
+                    if (activeIndex >= 0) {
+                        ticks[activeIndex].removeAttribute("aria-current");
+                    }
+                    activeIndex = currentIndex;
+                    ticks[activeIndex].setAttribute("aria-current", "location");
+                }
+            }
+            function scheduleUpdate() {
+                if (!scheduled) {
+                    scheduled = true;
+                    requestAnimationFrame(updatePosition);
+                }
+            }
+            window.addEventListener("scroll", scheduleUpdate, { passive: true });
+            function updateLayout() {
+                updateDensity();
+                scheduleUpdate();
+            }
+            window.addEventListener("resize", updateLayout);
+            const resizeObserver = new ResizeObserver(updateLayout);
+            resizeObserver.observe(container);
+            updateDensity();
+            updatePosition();
+        }
+
+        function setSectionExpanded(disclosure, expanded, animate) {
+            const summary = disclosure.querySelector("summary");
+            const startHeight = disclosure.getBoundingClientRect().height;
+            const previousAnimation = sectionAnimations.get(disclosure);
+            if (previousAnimation) {
+                previousAnimation.cancel();
+                sectionAnimations.delete(disclosure);
+            }
+            summary.setAttribute("aria-expanded", String(expanded));
+            disclosure.style.removeProperty("overflow");
+            disclosure.open = expanded;
+
+            if (!animate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                return;
+            }
+
+            const endHeight = disclosure.getBoundingClientRect().height;
+            if (startHeight === endHeight) {
+                return;
+            }
+            // Keep the content rendered until the closing animation finishes.
+            disclosure.open = true;
+            disclosure.style.overflow = "hidden";
+            const animation = disclosure.animate(
+                [{ height: startHeight + "px" }, { height: endHeight + "px" }],
+                { duration: 240, easing: "ease-in-out" }
+            );
+            sectionAnimations.set(disclosure, animation);
+            animation.onfinish = function () {
+                disclosure.open = expanded;
+                disclosure.style.removeProperty("overflow");
+                sectionAnimations.delete(disclosure);
+            };
+        }
+
+        function openSectionFromHash(hash) {
+            const target = document.getElementById(hash.slice(1));
+            const section = target && target.closest(".section");
+            const disclosure = section && section.querySelector(".section-disclosure");
+            if (disclosure) {
+                setSectionExpanded(disclosure, true, false);
+            }
         }
 
         function createLinkedSiteTitle(site) {
@@ -595,12 +1268,16 @@
             return blocks;
         }
 
-        function createOfferItem(offer, glowCard) {
+        function createOfferItem(offer, glowCard, includeAnchorId) {
             const item = createElement("li", "offer");
+            item.dataset.scrollTitle = offer.name || "";
+            item.dataset.scrollAmount = offer.amount || "";
+            item.dataset.hideTimelineAmount = String(offer.hideTimelineAmount === true);
+            item.dataset.hideTimelineHoverLabel = String(offer.hideTimelineHoverLabel === true);
             if (offer.glow && !glowCard) {
                 item.classList.add("offer-highlight");
             }
-            if (offer.id) {
+            if (includeAnchorId !== false && offer.id) {
                 item.id = offer.id;
             }
             const topLine = createElement("div", "offer-topline");
@@ -712,15 +1389,18 @@
             return item;
         }
 
-        function createSiteCard(site) {
+        function createSiteCard(site, offersById) {
             const card = createElement("article", "site");
-            const isPortalWithOffers = Boolean(site.name && site.offers && site.offers.length > 0);
+            const resolvedOffers = (site.offers || []).map(function (entry) {
+                return resolveOfferEntry(entry, offersById);
+            });
+            const isPortalWithOffers = Boolean(site.name && resolvedOffers.length > 0);
 
             if (isPortalWithOffers) {
                 card.classList.add("site-portal");
             }
 
-            const glowCard = !site.name && Array.isArray(site.offers) && site.offers.length === 1 && site.offers[0].glow;
+            const glowCard = !site.name && resolvedOffers.length === 1 && resolvedOffers[0].offer.glow;
             if (glowCard) {
                 card.classList.add("site-highlight");
             }
@@ -734,11 +1414,11 @@
                 card.appendChild(createElement("p", "note", site.note));
             }
 
-            if (site.offers && site.offers.length > 0) {
+            if (resolvedOffers.length > 0) {
                 const offersClass = isPortalWithOffers ? "offers portal-offers" : "offers";
                 const offers = createElement("ul", offersClass);
-                site.offers.forEach(function (offer) {
-                    offers.appendChild(createOfferItem(offer, glowCard));
+                resolvedOffers.forEach(function (resolved) {
+                    offers.appendChild(createOfferItem(resolved.offer, glowCard, !resolved.isReference));
                 });
                 card.appendChild(offers);
             }
@@ -746,36 +1426,98 @@
             return card;
         }
 
-        function createSection(section, index) {
+        function createSection(section, index, offersById) {
             const wrapper = createElement("section", "section");
+            wrapper.id = "section-" + slugify(section.title);
             const titleId = "section-title-" + index;
             wrapper.setAttribute("aria-labelledby", titleId);
 
+            const disclosure = createElement("details", "section-disclosure");
+            disclosure.open = section.collapsed !== true;
+            const summary = createElement("summary");
+            summary.setAttribute("aria-expanded", String(disclosure.open));
+            summary.addEventListener("click", function (event) {
+                event.preventDefault();
+                setSectionExpanded(disclosure, summary.getAttribute("aria-expanded") !== "true", true);
+            });
             const heading = createElement("h2", null, section.title || "");
             heading.id = titleId;
-            wrapper.appendChild(heading);
+            summary.appendChild(heading);
+            disclosure.appendChild(summary);
 
             const grid = createElement("div", "site-grid");
             (section.sites || []).forEach(function (site) {
-                grid.appendChild(createSiteCard(site));
+                grid.appendChild(createSiteCard(site, offersById));
             });
-            wrapper.appendChild(grid);
+            disclosure.appendChild(grid);
+            wrapper.appendChild(disclosure);
 
             return wrapper;
         }
 
+        function initializePageEndSpace(container) {
+            const spacer = createElement("div", "page-end-space", "[THIS SPACE INTENTIONALLY LEFT BLANK]");
+            spacer.setAttribute("aria-hidden", "true");
+            container.appendChild(spacer);
+            const targets = Array.from(container.querySelectorAll(".section, .offer")).reverse();
+            function updateSpace() {
+                const timeline = document.querySelector(".scroll-timeline");
+                spacer.hidden = !timeline || timeline.getClientRects().length === 0;
+                if (spacer.hidden) {
+                    return;
+                }
+                const lastTarget = targets.find(function (target) {
+                    return target.getClientRects().length > 0;
+                });
+                if (!lastTarget) {
+                    return;
+                }
+                const offset = parseFloat(getComputedStyle(lastTarget).scrollMarginTop);
+                const remainingContent = spacer.getBoundingClientRect().top - lastTarget.getBoundingClientRect().top;
+                const bottomPadding = parseFloat(getComputedStyle(container).paddingBottom);
+                const height = Math.max(0, Math.ceil(window.innerHeight - offset - remainingContent - bottomPadding));
+                const value = height + "px";
+                if (spacer.style.height !== value) {
+                    spacer.style.height = value;
+                }
+            }
+            const resizeObserver = new ResizeObserver(updateSpace);
+            resizeObserver.observe(container);
+            window.addEventListener("resize", updateSpace);
+            updateSpace();
+            return updateSpace;
+        }
+
         function renderPage(data) {
             emailsMap = data.emails || {};
+            const sections = data.sections || [];
+            const offersById = collectReusableOffers(sections);
             const content = document.getElementById("content");
-
-            content.remove();
             const container = document.querySelector("main.page");
             const replacement = document.createDocumentFragment();
-            (data.sections || []).forEach(function (section, index) {
-                replacement.appendChild(createSection(section, index));
+            const tableOfContents = createTableOfContents(sections);
+            const navSentinel = createElement("div", "section-nav-sentinel");
+            navSentinel.setAttribute("aria-hidden", "true");
+            if (tableOfContents) {
+                replacement.appendChild(navSentinel);
+                replacement.appendChild(tableOfContents);
+            }
+            sections.forEach(function (section, index) {
+                replacement.appendChild(createSection(section, index, offersById));
             });
+            content.remove();
             container.appendChild(replacement);
+            if (tableOfContents) {
+                initializeStickyNavigation(tableOfContents, navSentinel);
+            }
+            const updatePageEndSpace = initializePageEndSpace(container);
+            initializeScrollTimeline(container, data.timelineFullRowHover !== false, updatePageEndSpace);
+            openSectionFromHash(window.location.hash);
         }
+
+        window.addEventListener("hashchange", function () {
+            openSectionFromHash(window.location.hash);
+        });
 
         function showError(message) {
             const content = document.getElementById("content");
@@ -785,7 +1527,11 @@
         document.addEventListener("DOMContentLoaded", function () {
             const embeddedData = getEmbeddedData();
             if (embeddedData) {
-                renderPage(embeddedData);
+                try {
+                    renderPage(embeddedData);
+                } catch (error) {
+                    showError(error.message || "Unable to load embedded offer data.");
+                }
             } else {
                 showError("Unable to load embedded offer data JSON.");
             }
@@ -806,6 +1552,7 @@
 
     <script id="offers-data" type="application/json">
 {
+    "timelineFullRowHover": true,
     "emails": {
         "default": "c29tZWd1eXJlZkBhdG9taWNtYWlsLmlv"
     },
@@ -817,6 +1564,7 @@
                     "offers": [
                         {
                             "amount": "(good karma)",
+                            "hideTimelineAmount": true,
                             "name": "Cure Alzheimer's Fund (DoC Supported Charity)",
                             "url": "https://give.curealz.org/team/821348",
                             "requirements": "Donate any amount",
@@ -837,35 +1585,14 @@
                 {
                     "offers": [
                         {
-                            "amount": "$100",
-                            "name": "Public Brokerage",
-                            "url": "https://public.com/user-referral?referrer=Joshua48361",
-                            "tag": "EASY",
-                            "requirements": "Deposit $1,000+",
-                            "instructions": {
-                                "collapsible": true,
-                                "open": true,
-                                "label": "Instructions",
-                                "steps": [
-                                    "Sign up with the referral [link](https://public.com/user-referral?referrer=Joshua48361).",
-                                    "Initiate your first deposit of $1,000 or more.",
-                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) (may need to click the small x in top right) and manually enter the promo code **Joshua48361** to receive the bonus right away.",
-                                    "Choose which stock/ETF you want the bonus in (I chose VOO).",
-                                    "Withdraw the original deposit anytime after it settles (but may be wise to wait a couple weeks to not set off any flags).",
-									"Wait 12 months before selling the stock/ETF and withdrawing."
-                                ]
-                            }
+                            "offerRef": "public-brokerage"
                         }
                     ]
                 },
                 {
                     "offers": [
                         {
-                            "amount": "$80",
-                            "name": "Capital One Shopping",
-                            "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
-                            "tag": "EASY",
-                            "requirements": "Install the desktop or mobile extension within 7 days of account creation and leave it installed for 90 days. No purchase necessary. Can uninstall early once receive bonus."
+                            "offerRef": "capital-one-shopping"
                         }
                     ]
                 }
@@ -1074,63 +1801,22 @@
             ]
         },
         {
-            "title": "Investing",
+            "title": "Cashback Portals",
             "sites": [
                 {
+                    "name": "Capital One Shopping",
+                    "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
                     "offers": [
                         {
-                            "amount": "$110",
-                            "name": "Roots",
-                            "description": "Investing in single-family rental homes and residential real estate.",
-                            "url": "https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ",
-                            "requirements": "Make initial $100 investment.",
-                            "instructions": {
-                                "collapsible": true,
-                                "label": "Instructions",
-                                "steps": [
-                                    "Create your Roots account through my referral [link](https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ).",
-                                    {
-                                        "text": "Make your first $100 investment, then stack the promo codes below for additional bonus funding:",
-                                        "substeps": [
-                                            "My referral (applied automatically): $25 bonus",
-                                            "**EW25**: $25 bonus",
-                                            "**SEED25**: $25 bonus",
-                                            "**QUIZ10**: $10 bonus",
-                                            "**GROWWITHROOTS25**: $25 bonus"
-                                        ]
-                                    },
-                                    "In summary, a $100 deposit ends up as $210 invested in your account withdrawlable after 1 year."
-                                ]
-                            },
-                            "details": {
-                                "collapsible": true,
-                                "label": "Important Notes",
-                                "items": [
-                                    "Your deposit and bonus stay locked for one year; after that you can withdraw everything penalty-free.",
-                                    "Withdrawing before the year is up triggers an 8% penalty on your deposit and forfeits the bonus.",
-                                    "My take: the one-year hold is a little annoying, but with only $100 on the line it's an easy wait.  You'll also earn at least a 4% APY."
-                                ]
-                            }
+                            "offerId": "capital-one-shopping",
+                            "amount": "$80",
+                            "name": "Capital One Shopping",
+                            "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
+                            "tag": "EASY",
+                            "requirements": "Install the desktop or mobile extension within 7 days of account creation and leave it installed for 90 days. Make purchases totaling at least $10 within 30 days."
                         }
                     ]
                 },
-                {
-                    "offers": [
-                        {
-                            "amount": "$50",
-                            "name": "Groundfloor",
-                            "description": "Short-term real estate debt investing.",
-                            "url": "https://groundfloor.onelink.me/Jaqm/referral?code=o4d5c5&af_dp=groundfloor%3A%2F%2F&deep_link_value=referral_code&deep_link_sub1=o4d5c5",
-                            "requirements": "Make your first investment of $100 or more.",
-                            "details": "Shortest investment term is 30 days at around 5% APY. It takes 30 days to see the $50 credit, and it must be invested before it can be withdrawn."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "title": "Cashback Portals",
-            "sites": [
                 {
                     "name": "CashInStyle",
                     "url": "https://cashinstyle.com/?ref=someguyref",
@@ -1306,6 +1992,86 @@
                 {
                     "name": "InboxDollars",
                     "url": "https://www.inboxdollars.com?rb=207544411"
+                }
+            ]
+        },
+        {
+            "title": "Investing Offers",
+            "sites": [
+                {
+                    "offers": [
+                        {
+                            "offerId": "public-brokerage",
+                            "amount": "$100",
+                            "name": "Public Brokerage",
+                            "url": "https://public.com/user-referral?referrer=Joshua48361",
+                            "tag": "EASY",
+                            "requirements": "Deposit $1,000+",
+                            "instructions": {
+                                "collapsible": true,
+                                "open": true,
+                                "label": "Instructions",
+                                "steps": [
+                                    "Sign up with the referral [link](https://public.com/user-referral?referrer=Joshua48361).",
+                                    "Initiate your first deposit of $1,000 or more.",
+                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) (may need to click the small x in top right) and manually enter the promo code **Joshua48361** to receive the bonus right away.",
+                                    "Choose which stock/ETF you want the bonus in (I chose VOO).",
+                                    "Withdraw the original deposit anytime after it settles (but may be wise to wait a couple weeks to not set off any flags).",
+                                    "Wait 12 months before selling the stock/ETF and withdrawing."
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$110",
+                            "name": "Roots",
+                            "description": "Investing in single-family rental homes and residential real estate.",
+                            "url": "https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ",
+                            "requirements": "Make initial $100 investment.",
+                            "instructions": {
+                                "collapsible": true,
+                                "label": "Instructions",
+                                "steps": [
+                                    "Create your Roots account through my referral [link](https://app.investwithroots.com/sign-up/start?referral_code=wmwo9iz_WqtiVn0ftGusPQ).",
+                                    {
+                                        "text": "Make your first $100 investment, then stack the promo codes below for additional bonus funding:",
+                                        "substeps": [
+                                            "My referral (applied automatically): $25 bonus",
+                                            "**EW25**: $25 bonus",
+                                            "**SEED25**: $25 bonus",
+                                            "**QUIZ10**: $10 bonus",
+                                            "**GROWWITHROOTS25**: $25 bonus"
+                                        ]
+                                    },
+                                    "In summary, a $100 deposit ends up as $210 invested in your account withdrawlable after 1 year."
+                                ]
+                            },
+                            "details": {
+                                "collapsible": true,
+                                "label": "Important Notes",
+                                "items": [
+                                    "Your deposit and bonus stay locked for one year; after that you can withdraw everything penalty-free.",
+                                    "Withdrawing before the year is up triggers an 8% penalty on your deposit and forfeits the bonus.",
+                                    "My take: the one-year hold is a little annoying, but with only $100 on the line it's an easy wait.  You'll also earn at least a 4% APY."
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
+                            "amount": "$50",
+                            "name": "Groundfloor",
+                            "description": "Short-term real estate debt investing.",
+                            "url": "https://groundfloor.onelink.me/Jaqm/referral?code=o4d5c5&af_dp=groundfloor%3A%2F%2F&deep_link_value=referral_code&deep_link_sub1=o4d5c5",
+                            "requirements": "Make your first investment of $100 or more.",
+                            "details": "Shortest investment term is 30 days at around 5% APY. It takes 30 days to see the $50 credit, and it must be invested before it can be withdrawn."
+                        }
+                    ]
                 }
             ]
         }
