@@ -16,6 +16,7 @@
             --line: #cfd8cd;
             --accent: #0b6e4f;
             --accent-2: #126782;
+            --link-hover: #b54708;
             --easy: #1f7a1f;
             --moderate: #8a5a00;
             --shadow: 0 10px 30px rgba(24, 32, 38, 0.1);
@@ -66,7 +67,7 @@
 
         .hero {
             padding: 0;
-            margin-bottom: 14px;
+            margin-bottom: 6px;
             animation: rise-in 400ms ease-out;
         }
 
@@ -232,7 +233,7 @@
             opacity: 0;
         }
 
-        .scroll-timeline-description > span {
+        .scroll-timeline-description>span {
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -249,7 +250,7 @@
             opacity: 1;
         }
 
-        .scroll-timeline-amount + .scroll-timeline-description > span {
+        .scroll-timeline-amount+.scroll-timeline-description>span {
             padding-left: 6px;
         }
 
@@ -269,7 +270,7 @@
             flex: 0 0 var(--timeline-section-height);
         }
 
-        .scroll-timeline-compact .scroll-timeline-amount + .scroll-timeline-description > span {
+        .scroll-timeline-compact .scroll-timeline-amount+.scroll-timeline-description>span {
             padding-left: 0;
         }
 
@@ -287,7 +288,7 @@
             top: 0;
             z-index: 10;
             isolation: isolate;
-            margin: 12px 0 0;
+            margin: 6px 0 0;
             padding: 6px 0;
         }
 
@@ -328,7 +329,7 @@
             pointer-events: none;
         }
 
-        .section-nav + .section {
+        .section-nav+.section {
             margin-top: 4px;
         }
 
@@ -371,7 +372,7 @@
             flex-shrink: 0;
         }
 
-        .section-contact > a {
+        .section-contact>a {
             transform: translateY(-3px);
             min-width: 0;
             overflow: hidden;
@@ -401,7 +402,7 @@
             font-size: clamp(1.35rem, 3.7vw, 1.8rem);
         }
 
-        .section-disclosure > summary {
+        .section-disclosure>summary {
             display: flex;
             align-items: center;
             gap: 14px;
@@ -412,11 +413,11 @@
             list-style: none;
         }
 
-        .section-disclosure > summary::-webkit-details-marker {
+        .section-disclosure>summary::-webkit-details-marker {
             display: none;
         }
 
-        .section-disclosure > summary::before {
+        .section-disclosure>summary::before {
             content: "";
             color: var(--accent-2);
             width: 16px;
@@ -428,11 +429,11 @@
             transform: rotate(-45deg);
         }
 
-        .section-disclosure > summary[aria-expanded="true"]::before {
+        .section-disclosure>summary[aria-expanded="true"]::before {
             transform: translateY(-4px) rotate(45deg);
         }
 
-        .section-disclosure > summary:focus-visible {
+        .section-disclosure>summary:focus-visible {
             outline: 3px solid var(--accent-2);
             outline-offset: 4px;
         }
@@ -443,11 +444,12 @@
         }
 
         .site {
+            --site-padding: 14px;
             border: 1px solid var(--line);
             background: #fff;
             border-radius: 14px;
             box-shadow: var(--shadow);
-            padding: 14px;
+            padding: var(--site-padding);
         }
 
         .site-highlight,
@@ -476,7 +478,7 @@
                 transition: opacity 200ms ease;
             }
 
-            .section-disclosure > summary::before {
+            .section-disclosure>summary::before {
                 transition: transform 240ms ease;
             }
 
@@ -499,17 +501,25 @@
         }
 
         .site-title {
-            margin: 0 0 10px;
-            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            margin: calc(0px - var(--site-padding)) calc(0px - var(--site-padding)) 12px;
+            font-size: 1.24rem;
             font-weight: 800;
             color: #0f4f65;
-            border-bottom: 3px solid #a8c7b5;
-            padding-bottom: 6px;
+            background: #e7f2f8;
+            border-bottom: 1px solid #c6dde8;
+            border-radius: 13px 13px 0 0;
+            padding: 10px var(--site-padding);
         }
 
         .site-title a {
+            display: block;
             color: inherit;
-            text-decoration: none;
+        }
+
+        .site>.site-title:only-child {
+            margin-bottom: calc(0px - var(--site-padding));
+            border-bottom: 0;
+            border-radius: 13px;
         }
 
         .portal-offers {
@@ -543,6 +553,26 @@
 
         .offer-topline {
             font-size: 1rem;
+        }
+
+        .offer-links-trigger {
+            padding: 0;
+            border: 0;
+            background: none;
+            color: #0a4d72;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .offer-links-trigger:hover,
+        .offer-links-trigger:focus-visible {
+            color: var(--link-hover);
+        }
+
+        .offer-links-trigger:focus-visible {
+            outline: 2px solid var(--accent-2);
+            outline-offset: 2px;
         }
 
         .amount {
@@ -672,7 +702,8 @@
         }
 
         .reveal-email:hover {
-            background: #e8f0f5;
+            color: var(--link-hover);
+            border-color: currentColor;
         }
 
         .message {
@@ -685,10 +716,39 @@
 
         a {
             color: #0a4d72;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
         }
 
-        a:hover {
-            color: #07364f;
+        a:not(.scroll-timeline-tick):hover,
+        a:not(.scroll-timeline-tick):focus-visible {
+            color: var(--link-hover);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        a.offer-link,
+        a.offer-link:hover,
+        a.offer-link:focus-visible {
+            text-decoration: none;
+        }
+
+        .offer-link .amount,
+        .offer-link .name {
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        .section-contact-reveal:hover .section-contact-icon,
+        .section-contact-reveal:focus-visible .section-contact-icon {
+            color: var(--link-hover);
+        }
+
+        a:not(.scroll-timeline-tick):focus-visible {
+            outline: 2px solid var(--accent-2);
+            outline-offset: 2px;
         }
 
         @keyframes rise-in {
@@ -715,7 +775,7 @@
             }
 
             .site {
-                padding: 12px;
+                --site-padding: 12px;
             }
 
             .portal-offers {
@@ -742,6 +802,7 @@
         // Set timelineFullRowHover: false at the JSON root to limit hover to ticks and text.
         // Offer flags hideTimelineAmount and hideTimelineHoverLabel independently hide static amounts and hover labels.
         // Sections are open by default; set "collapsed": true on a section to start it closed.
+        // Section titles are defined once in JSON; showInNavigation includes that title in the top navigation.
         // JSON shape: { emails?, sections: [ { title, sites: [ { name?, url?, note?, offers?[] } ] } ] }
         // Offer collapsibles use a "blocks" array; each block picks a "preset" (label + colors) and may override label/color.
         let emailsMap = {};
@@ -921,9 +982,8 @@
         }
 
         function createTableOfContents(sections) {
-            const titles = ["Bank Offers", "Cashback Portals", "Investing Offers"];
             const matchingSections = (sections || []).filter(function (section) {
-                return titles.indexOf(section.title) !== -1;
+                return section.showInNavigation === true;
             });
             if (matchingSections.length === 0) {
                 return null;
@@ -1288,12 +1348,35 @@
             const offerUrl = offer.url || (Array.isArray(offer.links) && offer.links.length === 1 ? offer.links[0].url : "");
 
             if (offerUrl) {
-                const link = createElement("a");
+                const link = createElement("a", "offer-link");
                 link.href = offerUrl;
                 link.dataset.gc = offerId;
                 link.appendChild(amount);
                 link.appendChild(name);
                 topLine.appendChild(link);
+            } else if (Array.isArray(offer.links) && offer.links.length > 1) {
+                const trigger = createElement("button", "offer-link offer-links-trigger");
+                trigger.type = "button";
+                trigger.setAttribute("aria-label", "Show platform links for " + offer.name);
+                trigger.appendChild(amount);
+                trigger.appendChild(name);
+                trigger.addEventListener("click", function () {
+                    const chips = item.querySelectorAll(".links .chip");
+                    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        chips[0].focus({ preventScroll: true });
+                        return;
+                    }
+                    chips.forEach(function (chip) {
+                        chip.getAnimations().forEach(function (animation) {
+                            animation.cancel();
+                        });
+                        chip.animate(
+                            [{ transform: "scale(1)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }],
+                            { duration: 400, easing: "ease-in-out" }
+                        );
+                    });
+                });
+                topLine.appendChild(trigger);
             } else {
                 topLine.appendChild(amount);
                 topLine.appendChild(name);
@@ -1342,7 +1425,7 @@
 
             if (offer.detailAnchor) {
                 const details = createElement("div", "requirement");
-                const link = createElement("a", null, "Chime Bonus Stack Details");
+                const link = createElement("a", null, "Jump to Chime Bonus Stack Details");
                 link.href = "#" + offer.detailAnchor;
                 link.target = "_self";
                 link.addEventListener("click", function () {
@@ -1600,6 +1683,7 @@
         },
         {
             "title": "Bank Offers",
+            "showInNavigation": true,
             "sites": [
                 {
                     "offers": [
@@ -1616,7 +1700,7 @@
                                     "label": "Stack Instructions",
                                     "collapsible": true,
                                     "items": [
-                                        "__Stack Overview__: Referral ($100) + Promo Code ($200) + Cashback Portal ($100-$400) = $400-$700 bonus",
+                                        "**Stack Overview**: Referral ($100) + Promo Code ($200) + Cashback Portal ($100-$400) = $400-$700 bonus",
                                         {
                                             "text": "Open my [Chime referral link](https://www.chime.com/r/terrellwhite/?c=s) in one tab and leave it open without signing up.",
                                             "substeps": [
@@ -1634,7 +1718,7 @@
                                                     "substeps": [
                                                         "[CashInStyle - $417 (RevU)](https://cashinstyle.com/walls/offers/43788477/chime-200-direct-deposit?ref=someguyref)",
                                                         "[GemsLoot - $390 (RevU)](https://gemsloot.com/?aff=someguy)",
-                                                        "[Earnopolis - $273 (PrimeEarn or RevU)](https://earnopolis.com/r/?r=magnetic-dionysus-0lvgl)",
+                                                        "[Earnopolis - $317 (PrimeEarn or RevU)](https://earnopolis.com/r/?r=magnetic-dionysus-0lvgl)",
                                                         {
                                                             "text": "*Recommended: Don't repeat offers through the same offer wall (ie. RevU, PrimeEarn) across portals; doing so may risk denied payment or account closure. Some portals offer multiple offer walls, so plan accordingly.",
                                                             "small": true
@@ -1802,6 +1886,7 @@
         },
         {
             "title": "Cashback Portals",
+            "showInNavigation": true,
             "sites": [
                 {
                     "name": "Capital One Shopping",
@@ -1940,7 +2025,6 @@
                 {
                     "name": "GemsLoot",
                     "url": "https://gemsloot.com/?aff=someguy",
-                    "note": "Search for these offers after signup:",
                     "offers": [
                         {
                             "amount": "$390",
@@ -1961,13 +2045,13 @@
                 {
                     "name": "Earnopolis",
                     "url": "https://earnopolis.com/r/?r=magnetic-dionysus-0lvgl",
-                    "note": "Search for these offers after signup:",
                     "offers": [
                         {
-                            "amount": "$273",
+                            "amount": "$317",
                             "name": "Chime",
                             "url": "https://earnopolis.com/r/?r=magnetic-dionysus-0lvgl",
-                            "detailAnchor": "chime-bonus-stack"
+                            "detailAnchor": "chime-bonus-stack",
+                            "requirements": "Direct Deposit $200"
                         }
                     ]
                 },
@@ -1997,6 +2081,7 @@
         },
         {
             "title": "Investing Offers",
+            "showInNavigation": true,
             "sites": [
                 {
                     "offers": [
