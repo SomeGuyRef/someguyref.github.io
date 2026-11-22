@@ -358,7 +358,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 2rem;
+            height: 2.75rem;
             gap: 8px;
             margin-top: 0;
             color: var(--muted);
@@ -367,9 +367,9 @@
 
         .section-contact-icon {
             color: var(--accent-2);
-            font-size: 1.3rem;
-            line-height: 1;
             flex-shrink: 0;
+            width: 1.75rem;
+            height: 1.75rem;
         }
 
         .section-contact>a {
@@ -384,8 +384,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2rem;
-            height: 2rem;
+            width: 2.75rem;
+            height: 2.75rem;
             border: 0;
             padding: 0;
             background: none;
@@ -706,6 +706,68 @@
             border-color: currentColor;
         }
 
+        .copy-code {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            height: auto;
+            margin: 0 0.12em;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: #fff;
+            color: var(--accent-2);
+            cursor: pointer;
+            font: inherit;
+            font-style: normal;
+            line-height: 1;
+            vertical-align: -0.12em;
+            position: relative;
+            top: -4px;
+        }
+
+        .copy-code:hover {
+            border-color: var(--accent-2);
+            background: #f2f8f6;
+        }
+
+        .copy-code:focus-visible {
+            outline: 3px solid var(--accent-2);
+            outline-offset: 2px;
+        }
+
+        .copy-code-label {
+            color: var(--ink);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.95em;
+            letter-spacing: 0.03em;
+            text-align: center;
+            position: relative;
+            top: 1px;
+            transition: opacity 180ms ease;
+            user-select: text;
+        }
+
+        .copy-code-label.is-fading {
+            opacity: 0;
+        }
+
+        .copy-code.is-copied {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .copy-code-icon {
+            width: 1em;
+            height: 1em;
+            flex-shrink: 0;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         .message {
             border: 1px solid var(--line);
             border-radius: 10px;
@@ -851,8 +913,26 @@
             let icon;
             if (iconOnly) {
                 button.setAttribute("aria-label", "Show email address");
-                icon = createElement("span", "section-contact-icon", "\u2709");
+                icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                icon.setAttribute("class", "section-contact-icon");
+                icon.setAttribute("viewBox", "0 0 24 24");
+                icon.setAttribute("fill", "none");
+                icon.setAttribute("stroke", "currentColor");
+                icon.setAttribute("stroke-width", "2");
+                icon.setAttribute("stroke-linecap", "round");
+                icon.setAttribute("stroke-linejoin", "round");
                 icon.setAttribute("aria-hidden", "true");
+                icon.setAttribute("focusable", "false");
+                const envelope = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                envelope.setAttribute("x", "3");
+                envelope.setAttribute("y", "5");
+                envelope.setAttribute("width", "18");
+                envelope.setAttribute("height", "14");
+                envelope.setAttribute("rx", "2");
+                const flap = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                flap.setAttribute("d", "m3 7 9 6 9-6");
+                icon.appendChild(envelope);
+                icon.appendChild(flap);
                 button.appendChild(icon);
             } else {
                 button.textContent = "show email";
@@ -871,9 +951,98 @@
             return button;
         }
 
+        function copyTextFallback(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            let copied = false;
+            try {
+                textarea.focus();
+                textarea.select();
+                copied = document.execCommand("copy");
+            } catch (error) {
+                copied = false;
+            } finally {
+                textarea.remove();
+            }
+            return copied;
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text).then(
+                    function () {
+                        return true;
+                    },
+                    function () {
+                        return copyTextFallback(text);
+                    }
+                );
+            }
+            return Promise.resolve(copyTextFallback(text));
+        }
+
+        function createCopyCodeButton(code) {
+            const button = createElement("button", "copy-code");
+            button.type = "button";
+            button.setAttribute("aria-label", "Copy referral code " + code);
+            const label = createElement("code", "copy-code-label", code);
+            const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            icon.setAttribute("class", "copy-code-icon");
+            icon.setAttribute("viewBox", "0 0 24 24");
+            icon.setAttribute("aria-hidden", "true");
+            icon.setAttribute("focusable", "false");
+            const frontPage = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            frontPage.setAttribute("x", "8");
+            frontPage.setAttribute("y", "8");
+            frontPage.setAttribute("width", "14");
+            frontPage.setAttribute("height", "14");
+            frontPage.setAttribute("rx", "2");
+            const backPage = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            backPage.setAttribute("d", "M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3");
+            icon.appendChild(frontPage);
+            icon.appendChild(backPage);
+            button.appendChild(label);
+            button.appendChild(icon);
+
+            let resetTimer;
+            let fadeTimer;
+            function showFeedback(copied) {
+                window.clearTimeout(resetTimer);
+                window.clearTimeout(fadeTimer);
+                label.classList.remove("is-fading");
+                label.textContent = copied ? "COPIED" : "Copy failed";
+                button.classList.toggle("is-copied", copied);
+                button.setAttribute("aria-label", copied ? "Copied to clipboard" : "Copy failed; select the code to copy it manually");
+                resetTimer = window.setTimeout(function () {
+                    label.classList.add("is-fading");
+                    fadeTimer = window.setTimeout(function () {
+                        label.textContent = code;
+                        label.style.minWidth = "";
+                        label.classList.remove("is-fading");
+                        button.classList.remove("is-copied");
+                        button.setAttribute("aria-label", "Copy referral code " + code);
+                    }, 180);
+                }, 1100);
+            }
+            button.addEventListener("click", function () {
+                if (!label.style.minWidth) {
+                    label.style.minWidth = label.getBoundingClientRect().width + "px";
+                }
+                copyTextToClipboard(code).then(showFeedback, function () {
+                    showFeedback(false);
+                });
+            });
+            return button;
+        }
+
         function linkifyText(text) {
             const fragment = document.createDocumentFragment();
-            const pattern = /(\*\*[^*]+\*\*|__[^_]+__|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\]|\n)/g;
+            const pattern = /(\*\*[^*]+\*\*|__[^_]+__|\[copy:[^\]]+\]|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s]+|\[email(?::[\w-]+)?\]|\n)/g;
             let lastIndex = 0;
             let match;
             while ((match = pattern.exec(text)) !== null) {
@@ -889,6 +1058,8 @@
                     const underline = createElement("u");
                     underline.textContent = matched.slice(2, -2);
                     fragment.appendChild(underline);
+                } else if (matched.startsWith("[copy:")) {
+                    fragment.appendChild(createCopyCodeButton(matched.slice(6, -1)));
                 } else if (matched === "\n") {
                     fragment.appendChild(createElement("br"));
                 } else if (matched.startsWith("[") && matched.indexOf("](") !== -1) {
@@ -1700,7 +1871,7 @@
                                     "label": "Stack Instructions",
                                     "collapsible": true,
                                     "items": [
-                                        "**Stack Overview**: Referral ($100) + Promo Code ($200) + Cashback Portal ($100-$400) = $400-$700 bonus",
+                                        "**Stack Overview**: Referral ($100) + Promo Code ($200) + Cashback Portal ($100-$400) = $400-$700 bonus (per churn)",
                                         {
                                             "text": "Open my [Chime referral link](https://www.chime.com/r/terrellwhite/?c=s) in one tab and leave it open without signing up.",
                                             "substeps": [
@@ -1808,7 +1979,24 @@
                             "name": "MoneyLion",
                             "url": "https://mlion.us/$Someguyref",
                             "tag": "EASY",
-                            "requirements": "DD $100"
+                            "requirements": "Use referral code [copy:$SOMEGUYREF]. Receive two direct deposits of at least $100 each within 60 days of signup.",
+                            "instructions": {
+                                "collapsible": true,
+                                "label": "Instructions",
+                                "steps": [
+                                    "Sign up in a browser using the [MoneyLion signup page](https://accounts.moneylion.com/signup), or on mobile via the app using the [prefilled referral link](https://mlion.us/$Someguyref). If the referral code is not prefilled, enter [copy:$SOMEGUYREF].",
+                                    "After signing up, look for $5 in your Rewards balance and redeem it to your checking account.",
+                                    "Receive two direct deposits of at least $100 each within 60 days of signup. One of my deposits triggered the bonus, despite the offer saying it requires two.",
+                                    "Within a few days, the $50 bonus should appear in your Rewards balance. Redeem it to your checking account, then you can transfer everything out if you'd like."
+                                ]
+                            },
+                            "details": {
+                                "collapsible": true,
+                                "label": "Important Notes",
+                                "items": [
+                                    "The referral link will not mention the $55, but it is still showing valid in the app and the [Terms](https://www.moneylion.com/legal/referrals-terms-and-conditions) show no end date for the $55 promotion."
+                                ]
+                            }
                         }
                     ]
                 },
@@ -1898,7 +2086,20 @@
                             "name": "Capital One Shopping",
                             "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
                             "tag": "EASY",
-                            "requirements": "Install the desktop or mobile extension within 7 days of account creation and leave it installed for 90 days. Make purchases totaling at least $10 within 30 days."
+                            "requirements": "Install the extension and make a $10 purchase.",
+                            "blocks": [
+                                {
+                                    "preset": "instructions",
+                                    "label": "Instructions",
+                                    "collapsible": true,
+                                    "items": [
+                                        "Sign up using the [referral link](https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96).",
+                                        "Install the browser extension on desktop or the Capital One Shopping app on mobile within 7 days of creating your account.",
+                                        "Keep the extension or app installed for at least 90 days.",
+                                        "Make one or more qualifying purchases totaling at least $10 within 30 days of creating your account."
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 },
@@ -2099,10 +2300,17 @@
                                 "steps": [
                                     "Sign up with the referral [link](https://public.com/user-referral?referrer=Joshua48361).",
                                     "Initiate your first deposit of $1,000 or more.",
-                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) (may need to click the small x in top right) and manually enter the promo code **Joshua48361** to receive the bonus right away.",
+                                    "Go to the [Rewards page](https://public.com/settings/v2/rewards) (may need to click the small x in top right) and manually enter the promo code [copy:Joshua48361] to receive the bonus right away.",
                                     "Choose which stock/ETF you want the bonus in (I chose VOO).",
                                     "Withdraw the original deposit anytime after it settles (but may be wise to wait a couple weeks to not set off any flags).",
-                                    "Wait 12 months before selling the stock/ETF and withdrawing."
+                                    "Wait 12 months before withdrawing the bonus."
+                                ]
+                            },
+                            "details": {
+                                "collapsible": true,
+                                "label": "Important Notes",
+                                "items": [
+                                    "You can sell the bonus stock/ETF and buy something else, such as SGOV, which is generally more stable than stocks. The bonus must still remain in the account for 12 months before withdrawal."
                                 ]
                             }
                         }
@@ -2125,10 +2333,10 @@
                                         "text": "Make your first $100 investment, then stack the promo codes below for additional bonus funding:",
                                         "substeps": [
                                             "My referral (applied automatically): $25 bonus",
-                                            "**EW25**: $25 bonus",
-                                            "**SEED25**: $25 bonus",
-                                            "**QUIZ10**: $10 bonus",
-                                            "**GROWWITHROOTS25**: $25 bonus"
+                                            "[copy:EW25]: $25 bonus",
+                                            "[copy:SEED25]: $25 bonus",
+                                            "[copy:QUIZ10]: $10 bonus",
+                                            "[copy:GROWWITHROOTS25]: $25 bonus"
                                         ]
                                     },
                                     "In summary, a $100 deposit ends up as $210 invested in your account withdrawlable after 1 year."
