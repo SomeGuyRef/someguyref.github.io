@@ -860,7 +860,7 @@
     </main>
 
     <script>
-        // Offers may define offerId and be reused with { offerRef: "offer-id" } in another section.
+        // Offers may define offerId and be reused with { offerRef: "offer-id", name?: "Override" } in another section.
         // Set timelineFullRowHover: false at the JSON root to limit hover to ticks and text.
         // Offer flags hideTimelineAmount and hideTimelineHoverLabel independently hide static amounts and hover labels.
         // Sections are open by default; set "collapsed": true on a section to start it closed.
@@ -1148,6 +1148,15 @@
             const offer = offersById.get(offerId);
             if (!offer) {
                 throw new Error("Unknown offerRef: " + offerId);
+            }
+            if (Object.prototype.hasOwnProperty.call(entry, "name")) {
+                if (typeof entry.name !== "string" || !entry.name.trim()) {
+                    throw new Error("Offer reference name overrides must be non-empty strings.");
+                }
+                return {
+                    offer: Object.assign({}, offer, { name: entry.name }),
+                    isReference: true
+                };
             }
             return { offer: offer, isReference: true };
         }
@@ -1839,7 +1848,8 @@
                 {
                     "offers": [
                         {
-                            "offerRef": "shopback-new-user"
+                            "offerRef": "shopback-new-user",
+                            "name": "ShopBack"
                         }
                     ]
                 },
@@ -2274,12 +2284,13 @@
                             "url": "https://app.shopback.com/5480u2cNk8b",
                             "tag": "EASY",
                             "requirements": "Earn $10 in confirmed cashback within 180 days.",
-                            "details": {
+                            "instructions": {
                                 "collapsible": true,
-                                "label": "Important Info",
-                                "items": [
-                                    "Only confirmed cashback counts toward the $10 requirement.",
-                                    "Browse [Digital Services Offers](https://www.shopback.com/digital-services) and look for offers with 100% or more cashback to easily satisfy this requirement."
+                                "label": "Instructions",
+                                "steps": [
+                                    "Sign up using the [referral link](https://app.shopback.com/5480u2cNk8b).",
+                                    "Complete an offer to earn $10+ in cashback.  You can browse [Digital Services Offers](https://www.shopback.com/digital-services) and find an offer with 100% or more cashback to easily meet this requirement.",
+                                    "Confirm the cashback is tracking in your account.","Once cashback is confirmed, bonus will be credited."
                                 ]
                             }
                         }
