@@ -1848,6 +1848,13 @@
                 {
                     "offers": [
                         {
+                            "offerRef": "topcashback-quickbooks"
+                        }
+                    ]
+                },
+                {
+                    "offers": [
+                        {
                             "offerRef": "spruce-money"
                         }
                     ]
@@ -1856,7 +1863,7 @@
                     "offers": [
                         {
                             "offerRef": "shopback-new-user",
-                            "name": "ShopBack"
+                            "name": "ShopBack (New User)"
                         }
                     ]
                 },
@@ -1870,7 +1877,8 @@
                 {
                     "offers": [
                         {
-                            "offerRef": "capital-one-shopping"
+                            "offerRef": "capital-one-shopping",
+                            "name": "Capital One Shopping (New User)"
                         }
                     ]
                 }
@@ -2107,7 +2115,7 @@
                         {
                             "offerId": "capital-one-shopping",
                             "amount": "$80",
-                            "name": "Capital One Shopping",
+                            "name": "New User Offer",
                             "url": "https://capitaloneshopping.com/referred?code=b8fe28c1-f7f6-4ffa-8c39-5071e4252d96",
                             "tag": "EASY",
                             "requirements": "Install the extension and make a $10 purchase.",
@@ -2319,7 +2327,31 @@
                 },
                 {
                     "name": "TopCashBack",
-                    "url": "https://www.topcashback.com/ref/somethingusername"
+                    "url": "https://www.topcashback.com/ref/somethingusername",
+                    "offers": [
+                        {
+                            "offerId": "topcashback-quickbooks",
+                            "amount": "$65",
+                            "name": "QuickBooks",
+                            "url": "https://www.topcashback.com/ref/somethingusername/quickbooks",
+                            "requirements": "Make a subscription purchase ($12 for QuickBooks Online Simple Start).",
+                            "instructions": {
+                                "collapsible": true,
+                                "label": "Instructions",
+                                "steps": [
+                                    "Click through the [TopCashBack offer](https://www.topcashback.com/ref/somethingusername/quickbooks).",
+                                    {
+                                        "text": "Subscribe to the Simple Start plan for $11.40/month. Do not choose the free trial.",
+                                        "substeps": [
+                                            "You can pay with a [Privacy.com](https://app.privacy.com/join/K9R85) card with a total spend limit of $12, which should prevent any unexpected charges."
+                                        ]
+                                    },
+                                    "Cancel the subscription's auto-renewal before the first month ends from the [Products & Billing page](https://accounts.intuit.com/app/account-manager/productsBilling). You can cancel before the offer tracks.",
+                                    "The offer tracks on TopCashBack for **$6.60** the same day, then for an additional **$70.70** a couple of days later, making it a profit of approximately **$65**."
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "InboxDollars",
